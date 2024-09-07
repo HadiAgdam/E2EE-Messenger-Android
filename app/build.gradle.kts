@@ -51,7 +51,9 @@ android {
 
 dependencies {
 
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.24.13-rc")
+
+    implementation(libs.volley)
+    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
