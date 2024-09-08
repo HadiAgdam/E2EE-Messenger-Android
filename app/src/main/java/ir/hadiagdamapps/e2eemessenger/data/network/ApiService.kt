@@ -1,6 +1,5 @@
 package ir.hadiagdamapps.e2eemessenger.data.network
 
-import ir.hadiagdamapps.e2eemessenger.data.models.PublicKey
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.IncomingMessage
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.OutgoingMessage
 import retrofit2.Response
@@ -16,8 +15,8 @@ interface ApiService {
 
     @GET("get_message")
     suspend fun getMessage(
-        @Query("message_id") messageId: Int,
-        @Query("publicKey") publicKey: PublicKey
+        @Query("messageId") messageId: Int,
+        @Query("publicKey") publicKey: String
     ): Response<List<IncomingMessage>>
 
 }
