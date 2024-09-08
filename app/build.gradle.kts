@@ -53,6 +53,8 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+    testImplementation(libs.mockwebserver)
+
 
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.core.ktx)
