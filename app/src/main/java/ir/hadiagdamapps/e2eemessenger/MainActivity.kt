@@ -8,10 +8,11 @@ import androidx.navigation.compose.rememberNavController
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.ChatAppNavHost
 import ir.hadiagdamapps.e2eemessenger.ui.theme.E2EEMessengerTheme
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
 
             E2EEMessengerTheme {
