@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -41,7 +42,7 @@ fun E2EEMessengerTheme(
 
     LaunchedEffect(Unit) {
         systemUiController.setStatusBarColor(
-            color = ColorPalette.background, // Background color
+            color = Color.Black, // Background color
             darkIcons = false // Set to false for white text, true for black text
         )
     }
