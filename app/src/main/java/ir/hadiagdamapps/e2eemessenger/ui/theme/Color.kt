@@ -9,4 +9,7 @@ object ColorPalette {
     val secondary = Color(0xFF373E4E)
     val tertiary = Color(0xFF373E4E)
     val background = Color(0xFF1B202D)
+
+    val dangerRed = Color(0xFFF32013)
+    val lightBackground = Color(0xFFD9D9D9)
 }
