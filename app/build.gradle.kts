@@ -52,11 +52,26 @@ android {
 
 dependencies {
 
+    // Activity Compose
+    implementation(libs.androidx.activity.compose.v192)
+
+    // Camera X
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // Qr code Zxing
+    implementation(libs.zxing.android.embedded)
+
+    // Navigation
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 
+    // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
+
+    // MockWebServer for testing
     testImplementation(libs.mockwebserver)
 
     implementation(libs.accompanist.systemuicontroller)
