@@ -4,6 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class InboxScreenRoute(
-    val publicKey: String,
-    val privateKey: String
+    val publicKey: String
 )

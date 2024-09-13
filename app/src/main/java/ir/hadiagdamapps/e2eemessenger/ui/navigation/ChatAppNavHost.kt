@@ -23,6 +23,7 @@ fun ChatAppNavHost(navController: NavHostController) {
         composable<ChooseInboxScreenRoute> {
 
             val viewModel: ChooseInboxViewModel = viewModel()
+            viewModel.init(navController)
 
             ChooseInboxScreen(viewModel = viewModel)
         }

@@ -4,6 +4,6 @@ import android.graphics.Bitmap
 
 data class InboxDialogModel(
     val qrCode: Bitmap,
-    val publicKey: String,
-    val label: String
+    val dialogPublicKey: String,
+    val dialogLabel: String
 )

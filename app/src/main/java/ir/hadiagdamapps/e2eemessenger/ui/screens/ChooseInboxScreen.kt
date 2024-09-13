@@ -1,19 +1,14 @@
 package ir.hadiagdamapps.e2eemessenger.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
+import ir.hadiagdamapps.e2eemessenger.ui.components.InboxDetailsDialog
 import ir.hadiagdamapps.e2eemessenger.ui.components.InboxItem
 import ir.hadiagdamapps.e2eemessenger.ui.components.Screen
 import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.ChooseInboxViewModel
@@ -24,25 +19,35 @@ fun ChooseInboxScreen(viewModel: ChooseInboxViewModel) {
 
     Screen(
         title = "Choose Inbox",
-        fabClick = {}
+        fabClick = viewModel::newInbox
     ) {
 
-
-        Column(
+        LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
 
-
-            for (i in 1..8) {
-                InboxItem(
-                    modifier = Modifier.clickable {  },
-                    text = "asdasdsadhsakdjhjsakdhjksadhjkasasdasdsaasdasdasdd"
-                ) {
-
-                }
+            items(viewModel.inboxes) { inbox: InboxModel ->
+                InboxItem(text = inbox.label, modifier = Modifier.clickable {
+                    viewModel.inboxClick(inbox)
+                },
+                    moreClick = {
+                        viewModel.showDialog(inbox)
+                    }
+                )
             }
 
+
         }
+
+
+        if (viewModel.inboxDialog.value != null)
+            InboxDetailsDialog(
+                viewModel.inboxDialog.value!!,
+                dismiss = viewModel::dialogDismiss,
+                copyPublicKey = viewModel::dialogCopyPublicKey,
+                deleteInbox = viewModel::dialogDeleteInbox,
+                labelValueChange = viewModel::dialogLabelChange
+            )
 
     }
 }
