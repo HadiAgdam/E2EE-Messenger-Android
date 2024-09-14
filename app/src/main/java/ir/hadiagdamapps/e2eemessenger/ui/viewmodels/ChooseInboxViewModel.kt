@@ -16,7 +16,10 @@ import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.handler.PinDialogHandler
 class ChooseInboxViewModel : ViewModel() {
 
     private val inboxDialogHandler = InboxDetailsDialogHandler()
-    private val pinHandler = PinDialogHandler()
+    private val pinHandler = PinDialogHandler {
+       val inbox = data.newInbox(it)
+        _inboxes.add(inbox)
+    }
     private var navController: NavController? = null
     private val data = InboxData()
 
@@ -58,7 +61,7 @@ class ChooseInboxViewModel : ViewModel() {
     // ---------------------------------------------------------------------------------------
 
     fun newInbox() {
-        TODO()
+        pinHandler.pin.value = ""
     }
 
     fun inboxClick(inbox: InboxModel) {
@@ -74,7 +77,6 @@ class ChooseInboxViewModel : ViewModel() {
                     _inboxes.remove(i)
         inboxDialogHandler.delete()
     }
-
 
 
 }

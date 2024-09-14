@@ -14,7 +14,7 @@ class InboxData {
     fun delete(model: InboxModel) = delete(model.publicKey)
 
     // create a new inbox and return it
-    fun newInbox(): InboxModel {
+    fun newInbox(pin: String): InboxModel {
         TODO()
     }
 
