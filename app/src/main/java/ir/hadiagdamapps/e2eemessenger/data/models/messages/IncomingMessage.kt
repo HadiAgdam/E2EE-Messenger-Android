@@ -6,5 +6,6 @@ data class IncomingMessage(
     val messageId: Int,
     val encryptionKey: String,
     val encryptedMessage: String,
-    val time: Double
+    val time: Double,
+    val iv: String,
 )

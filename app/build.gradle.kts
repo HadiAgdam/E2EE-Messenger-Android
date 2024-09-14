@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "ir.hadiagdamapps.e2eemessenger"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -51,6 +51,8 @@ android {
 }
 
 dependencies {
+
+    implementation(libs.bcprov.jdk15to18)
 
     // Activity Compose
     implementation(libs.androidx.activity.compose.v192)

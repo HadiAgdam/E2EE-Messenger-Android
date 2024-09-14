@@ -25,7 +25,8 @@ class ApiServiceTest {
         val message = OutgoingMessage(
             "public key",
             "encryption key",
-            "message"
+            "message",
+            ""
         )
 
 
