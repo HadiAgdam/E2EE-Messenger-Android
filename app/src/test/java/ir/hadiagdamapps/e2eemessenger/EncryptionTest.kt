@@ -46,8 +46,15 @@ class EncryptionTest {
 
         println("decrypted message : $decryptedMessage")
 
+    }
 
-
+    @Test
+    fun testSalt() {
+        println("salt :${AesKeyGenerator.generateSalt()}")
+        println("salt :${AesKeyGenerator.generateSalt()}")
+        println("salt :${AesKeyGenerator.generateSalt()}")
+        println("salt :${AesKeyGenerator.generateSalt()}")
+        println("salt :${AesKeyGenerator.generateSalt()}")
     }
 
 }
