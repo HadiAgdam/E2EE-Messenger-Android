@@ -1,5 +1,7 @@
 package ir.hadiagdamapps.e2eemessenger.ui.viewmodels
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.LiveData
@@ -17,11 +19,11 @@ class ChooseInboxViewModel : ViewModel() {
 
     private val inboxDialogHandler = InboxDetailsDialogHandler()
     private val pinHandler = PinDialogHandler {
-       val inbox = data.newInbox(it)
+       val inbox = data!!.newInbox(it)
         _inboxes.add(inbox)
     }
     private var navController: NavController? = null
-    private val data = InboxData()
+    private var data: InboxData? = null
 
     private val _inboxes = mutableStateListOf<InboxModel>()
     val inboxes: SnapshotStateList<InboxModel> = _inboxes
@@ -36,8 +38,9 @@ class ChooseInboxViewModel : ViewModel() {
         get() = pinHandler.pinDialogError
 
 
-    fun init(navController: NavController) {
+    fun init(navController: NavController, context: Context) {
         this.navController = navController
+        data = InboxData(context)
     }
 
     // ---------------------------------------------------------------------------------------
@@ -71,7 +74,7 @@ class ChooseInboxViewModel : ViewModel() {
     }
 
     fun dialogDeleteInbox() {
-        if (data.delete(inboxDialog.value?.dialogPublicKey!!))
+        if (data!!.delete(inboxDialog.value?.dialogPublicKey!!))
             for (i in _inboxes)
                 if (i.publicKey == inboxDialog.value?.dialogPublicKey)
                     _inboxes.remove(i)

@@ -1,5 +1,6 @@
 package ir.hadiagdamapps.e2eemessenger.ui.navigation
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -18,12 +19,12 @@ import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.ChatScreenViewModel
 import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.ChooseInboxViewModel
 
 @Composable
-fun ChatAppNavHost(navController: NavHostController) {
+fun ChatAppNavHost(navController: NavHostController, context: Context) {
     NavHost(navController = navController, startDestination = ChooseInboxScreenRoute) {
         composable<ChooseInboxScreenRoute> {
 
             val viewModel: ChooseInboxViewModel = viewModel()
-            viewModel.init(navController)
+            viewModel.init(navController, context)
 
             ChooseInboxScreen(viewModel = viewModel)
         }
