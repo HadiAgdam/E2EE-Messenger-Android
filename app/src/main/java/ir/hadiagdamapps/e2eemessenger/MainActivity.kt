@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
 
             E2EEMessengerTheme {
                 val navHostController = rememberNavController()
-                ChatAppNavHost(navController = navHostController)
+                ChatAppNavHost(navController = navHostController, this)
             }
         }
     }
