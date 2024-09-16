@@ -44,7 +44,7 @@ class InboxData(context: Context) :
 
         values.put(INBOX_PUBLIC_KEY.toString(), pair.public.encoded.toText())
         values.put(INBOX_PRIVATE_KEY.toString(), privateKey)
-        values.put(LABEL.toString(), pair.public.toString())
+        values.put(LABEL.toString(), pair.public.encoded.toText())
         values.put(SALT.toString(), salt)
         values.put(IV.toString(), iv)
 
@@ -59,7 +59,6 @@ class InboxData(context: Context) :
         )
     }
 
-
     fun getInboxes(): List<InboxModel> {
         val c = readableDatabase.rawQuery("SELECT * FROM ${table.tableName}", null)
 
@@ -68,15 +67,24 @@ class InboxData(context: Context) :
         if (c.moveToFirst()) do
             result.add(
                 InboxModel(
-                    c.getString(1),
-                    c.getString(2),
-                    c.getString(3)
+                    publicKey = c.getString(1),
+                    encryptedPrivateKey =  c.getString(2),
+                    label =  c.getString(3)
                 )
             )
         while (c.moveToNext())
 
         c.close()
         return result
+    }
+
+
+    fun updateLabel(publicKey: String, label: String) {
+        val values = ContentValues()
+
+        values.put(LABEL.toString(), label)
+
+        writableDatabase.update(table.tableName,values, "inbox_public_key = ?", arrayOf(publicKey))
     }
 
     // -------------------------------------------------------------------
