@@ -37,18 +37,18 @@ fun ChooseInboxScreen(viewModel: ChooseInboxViewModel) {
         }
 
 
-        if (viewModel.inboxDialog.value != null) InboxDetailsDialog(
-            viewModel.inboxDialog.value!!,
+        if (viewModel.inboxDialog != null) InboxDetailsDialog(
+            model = viewModel.inboxDialog!!,
             dismiss = viewModel::inboxDialogDismiss,
             copyPublicKey = viewModel::inboxDialogCopyPublicKey,
-            deleteInbox = viewModel::dialogDeleteInbox,
+            deleteInbox = viewModel::deleteInbox,
             labelValueChange = viewModel::inboxDialogLabelChange
         )
 
-        if (viewModel.pin.value != null) PinDialog(
-            pin = viewModel.pin.value!!,
+        if (viewModel.pin != null) PinDialog(
+            pin = viewModel.pin!!,
             onPinChanged = viewModel::pinChanged,
-            error = viewModel.pinDialogError.value,
+            error = viewModel.pinDialogError,
             dismiss = viewModel::pinDialogDismiss,
             okClick = viewModel::pinDialogSubmit
         )
