@@ -108,7 +108,7 @@ class ChooseInboxViewModel : ViewModel() {
 
     fun deleteInbox() {
         if ((data ?: return).delete(inboxDialog?.dialogPublicKey ?: return))
-            for (i in _inboxes)
+            for (i in inboxes.toList())
                 if (i.publicKey == inboxDialog?.dialogPublicKey) _inboxes.remove(i)
         inboxDialog = null
     }

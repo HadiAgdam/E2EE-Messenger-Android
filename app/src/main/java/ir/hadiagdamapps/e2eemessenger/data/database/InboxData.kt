@@ -26,7 +26,7 @@ class InboxData(context: Context) :
     }
 
     fun delete(publicKey: String) =
-        1 == writableDatabase.delete(table.tableName, "inbox_public_key", arrayOf(publicKey))
+        1 == writableDatabase.delete(table.tableName, "inbox_public_key = ?", arrayOf(publicKey))
 
     fun delete(model: InboxModel) = delete(model.publicKey)
 
