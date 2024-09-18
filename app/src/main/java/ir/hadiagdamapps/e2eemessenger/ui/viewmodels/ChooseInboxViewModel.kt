@@ -102,7 +102,7 @@ class ChooseInboxViewModel : ViewModel() {
 
     fun inboxClick(inbox: InboxModel) {
         navController?.navigate(
-            InboxScreenRoute(inbox)
+            inbox
         )
     }
 
