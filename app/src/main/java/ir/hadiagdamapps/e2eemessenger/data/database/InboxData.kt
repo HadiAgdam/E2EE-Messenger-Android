@@ -42,21 +42,27 @@ class InboxData(context: Context) :
 
         val (privateKey, iv) = AesEncryptor.encryptMessage(pair.private.encoded.toText(), aesKey)
 
-        values.put(INBOX_PUBLIC_KEY.toString(), pair.public.encoded.toText())
-        values.put(INBOX_PRIVATE_KEY.toString(), privateKey)
-        values.put(LABEL.toString(), pair.public.encoded.toText())
-        values.put(SALT.toString(), salt)
-        values.put(IV.toString(), iv)
+
+        val model = InboxModel(
+            publicKey = pair.public.encoded.toText(),
+            encryptedPrivateKey = privateKey,
+            salt = salt,
+            iv = iv
+        )
+
+        values.put(INBOX_PUBLIC_KEY.toString(), model.publicKey)
+        values.put(INBOX_PRIVATE_KEY.toString(), model.encryptedPrivateKey)
+        values.put(LABEL.toString(), model.label)
+        values.put(SALT.toString(), model.salt)
+        values.put(IV.toString(), model.iv)
 
         writableDatabase.insert(table.tableName, null, values)
         writableDatabase.close()
 
 
-        return InboxModel(
-            pair.public.encoded.toText(),
-            privateKey,
-            pair.public.encoded.toText()
-        )
+        return model
+
+
     }
 
     fun getInboxes(): List<InboxModel> {
@@ -68,8 +74,10 @@ class InboxData(context: Context) :
             result.add(
                 InboxModel(
                     publicKey = c.getString(1),
-                    encryptedPrivateKey =  c.getString(2),
-                    label =  c.getString(3)
+                    encryptedPrivateKey = c.getString(2),
+                    label = c.getString(3),
+                    salt = c.getString(4),
+                    iv = c.getString(5)
                 )
             )
         while (c.moveToNext())

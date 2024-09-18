@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class InboxModel(
     val publicKey: String,
     val encryptedPrivateKey: String, // AES encrypted
-    var label: String = publicKey
     var label: String = publicKey.replace("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE", ""),
+    val salt: String? = null,
+    val iv: String? = null
 )
