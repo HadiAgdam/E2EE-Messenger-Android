@@ -57,4 +57,14 @@ class EncryptionTest {
         println("salt :${AesKeyGenerator.generateSalt()}")
     }
 
+
+    @Test
+    fun keyGeneratorTest() {
+
+        println(E2EKeyGenerator.generateKeyPair().public.encoded.toText())
+        println(E2EKeyGenerator.generateKeyPair().public.encoded.toText())
+        println(E2EKeyGenerator.generateKeyPair().public.encoded.toText())
+
+    }
+
 }
