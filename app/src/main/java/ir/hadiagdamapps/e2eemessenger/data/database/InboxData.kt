@@ -84,7 +84,7 @@ class InboxData(context: Context) :
 
         values.put(LABEL.toString(), label)
 
-        writableDatabase.update(table.tableName,values, "inbox_public_key = ?", arrayOf(publicKey))
+        writableDatabase.update(table.tableName, values, "inbox_public_key = ?", arrayOf(publicKey))
     }
 
     // -------------------------------------------------------------------
