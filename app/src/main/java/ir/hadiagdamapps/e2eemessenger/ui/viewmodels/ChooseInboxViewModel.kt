@@ -90,8 +90,10 @@ class ChooseInboxViewModel : ViewModel() {
     }
 
     fun pinChanged(newPin: String) {
-        if (newPin.length < PIN_LENGTH + 1) pin = newPin
-        pinDialogError = null
+        if (newPin.length < PIN_LENGTH + 1) {
+            pin = newPin
+            pinDialogError = null
+        }
     }
 
     fun newInbox() {
