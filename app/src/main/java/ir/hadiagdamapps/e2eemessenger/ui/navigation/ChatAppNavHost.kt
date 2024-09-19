@@ -34,7 +34,7 @@ fun ChatAppNavHost(navController: NavHostController, context: Context) {
             val args = it.toRoute<InboxScreenRoute>()
 
             val viewModel: InboxViewModel = viewModel()
-            viewModel.init(navController, args)
+            viewModel.init(navController, args, context)
 
             InboxScreen(viewModel = viewModel)
         }
