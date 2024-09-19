@@ -21,15 +21,19 @@ object AesEncryptor {
     }
 
 
-    fun decryptMessage(encryptedMessage: String, aesKey: SecretKey, ivString: String): String {
+    fun decryptMessage(encryptedMessage: String, aesKey: SecretKey, ivString: String): String? {
         val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
         val iv = Base64.getDecoder().decode(ivString)
         val ivSpec = IvParameterSpec(iv)
         cipher.init(Cipher.DECRYPT_MODE, aesKey, ivSpec)
-        val decryptedMessage = cipher.doFinal(Base64.getDecoder().decode(encryptedMessage))
+        val decryptedMessage: ByteArray
+        try {
+            decryptedMessage = cipher.doFinal(Base64.getDecoder().decode(encryptedMessage))
+        }
+        catch (ex: Exception) {
+            return null
+        }
 
         return String(decryptedMessage, Charsets.UTF_8)
     }
-
-
 }
