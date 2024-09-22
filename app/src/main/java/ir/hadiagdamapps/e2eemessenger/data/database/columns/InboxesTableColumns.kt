@@ -1,6 +1,6 @@
 package ir.hadiagdamapps.e2eemessenger.data.database.columns
 
-enum class InboxTableColumns {
+enum class InboxesTableColumns {
     INBOX_ID,
     INBOX_PUBLIC_KEY,
     INBOX_PRIVATE_KEY,

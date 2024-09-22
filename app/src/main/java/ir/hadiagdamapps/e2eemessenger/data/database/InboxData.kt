@@ -5,7 +5,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
-import ir.hadiagdamapps.e2eemessenger.data.database.columns.InboxTableColumns.*
+import ir.hadiagdamapps.e2eemessenger.data.database.columns.InboxesTableColumns.*
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
@@ -15,7 +15,7 @@ import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator.toText
 class InboxData(context: Context) :
     SQLiteOpenHelper(context, MessengerDatabase.DB_NAME, null, MessengerDatabase.DB_VERSION) {
 
-    private val table = Table.INBOX
+    private val table = Table.INBOXES
 
     private fun isPublicKeyExists(publicKey: String): Boolean {
         val query = "SELECT 1 FROM ${table.tableName} WHERE $INBOX_PUBLIC_KEY = ?"

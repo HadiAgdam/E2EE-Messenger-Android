@@ -11,20 +11,23 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat.PIN_LENGTH
+import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
-import ir.hadiagdamapps.e2eemessenger.data.models.ChatPreviewModel
+import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.InboxScreenRoute
+import javax.crypto.SecretKey
 
 
 class InboxViewModel : ViewModel() {
 
     private var inbox: InboxModel? = null
     private var navController: NavHostController? = null
+    private var data: ConversationData? = null
 
-    private val _chats = mutableStateListOf<ChatPreviewModel>()
-    val chats: SnapshotStateList<ChatPreviewModel> = _chats
+    private val _chats = mutableStateListOf<ConversationModel>()
+    val chats: SnapshotStateList<ConversationModel> = _chats
 
     var pin: String? by mutableStateOf("")
         private set
@@ -35,6 +38,8 @@ class InboxViewModel : ViewModel() {
     private var privateKey: String? = null
 
     private var displayWrongPinMessage: (() -> Unit)? = null
+
+    private var aesKey: SecretKey? = null
 
 
     // TODO user should enter pin to generate private key first
@@ -47,6 +52,7 @@ class InboxViewModel : ViewModel() {
             // WTF is going on here ?
             Toast.makeText(context, "wrong pin", Toast.LENGTH_SHORT).show()
         }
+        this.data = ConversationData(context)
     }
 
 
@@ -66,21 +72,36 @@ class InboxViewModel : ViewModel() {
                     AesKeyGenerator.generateKey(pin!!, it.salt!!),
                     it.iv!!
                 )
+                loadMessages()
             }
-        }
-     else pinDialogError = "invalid pin format"
+        } else pinDialogError = "invalid pin format"
 
 
+    private fun loadMessages() {
+        if (privateKey != null) {
+            aesKey = AesKeyGenerator.generateKey(pin!!, inbox?.salt!!)
 
-    fun loadMessages() = if (privateKey != null) {
+            inbox?.inboxId?.let { data?.loadConversations(inboxId = it) }
 
-        // TODO generate AES encryption key for messages using private key and message encryptionKey
-        // TODO get the message from db and decrypt them using AES key
+            val list = data?.loadConversations(inboxId = inbox?.inboxId!!)!!
+
+            _chats.clear()
+            for (item in list) {
+                val message = item.lastMessage.copy(text = AesEncryptor.decryptMessage(
+                    item.lastMessage.text,
+                    aesKey!!,
+                    inbox?.iv!!
+                )!!)
+
+                _chats.add(item.copy(lastMessage = message))
+            }
 
         } else {
-            navController?.popBackStack()
             displayWrongPinMessage?.invoke()
+
+            navController?.popBackStack()
         }
+    }
 
 
     fun newChat() {
