@@ -43,7 +43,8 @@ class InboxData(context: Context) :
         val (privateKey, iv) = AesEncryptor.encryptMessage(pair.private.encoded.toText(), aesKey)
 
 
-        val model = InboxModel(
+        var model = InboxModel(
+            inboxId = 0,
             publicKey = pair.public.encoded.toText(),
             encryptedPrivateKey = privateKey,
             salt = salt,
@@ -56,13 +57,12 @@ class InboxData(context: Context) :
         values.put(SALT.toString(), model.salt)
         values.put(IV.toString(), model.iv)
 
-        writableDatabase.insert(table.tableName, null, values)
-        writableDatabase.close()
+        val db = writableDatabase
+        model=model.copy( inboxId = db.insert(table.tableName, null, values))
+        db.close()
 
 
         return model
-
-
     }
 
     fun getInboxes(): List<InboxModel> {
@@ -73,6 +73,7 @@ class InboxData(context: Context) :
         if (c.moveToFirst()) do
             result.add(
                 InboxModel(
+                    inboxId = c.getLong(0),
                     publicKey = c.getString(1),
                     encryptedPrivateKey = c.getString(2),
                     label = c.getString(3),
