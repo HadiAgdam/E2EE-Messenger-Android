@@ -1,6 +1,9 @@
 package ir.hadiagdamapps.e2eemessenger.data
 
 import androidx.core.text.isDigitsOnly
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object TextFormat {
 
@@ -9,6 +12,10 @@ object TextFormat {
 
     fun isValidPin(text: String?): Boolean =
         (text ?: ("")).length == PIN_LENGTH && (text ?: ("")).isDigitsOnly()
+
+
+    fun timestampToText(timeStamp: Long): String =
+        SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(timeStamp))
 
 
 }
