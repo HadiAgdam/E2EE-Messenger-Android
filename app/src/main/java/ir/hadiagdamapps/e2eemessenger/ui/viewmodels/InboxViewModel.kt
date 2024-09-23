@@ -26,8 +26,8 @@ class InboxViewModel : ViewModel() {
     private var navController: NavHostController? = null
     private var data: ConversationData? = null
 
-    private val _chats = mutableStateListOf<ConversationModel>()
-    val chats: SnapshotStateList<ConversationModel> = _chats
+    private val _conversations = mutableStateListOf<ConversationModel>()
+    val conversations: SnapshotStateList<ConversationModel> = _conversations
 
     var pin: String? by mutableStateOf("")
         private set
@@ -85,7 +85,7 @@ class InboxViewModel : ViewModel() {
 
             val list = data?.loadConversations(inboxId = inbox?.inboxId!!)!!
 
-            _chats.clear()
+            _conversations.clear()
             for (item in list) {
                 val message = item.lastMessage.copy(text = AesEncryptor.decryptMessage(
                     item.lastMessage.text,
@@ -93,18 +93,31 @@ class InboxViewModel : ViewModel() {
                     inbox?.iv!!
                 )!!)
 
-                _chats.add(item.copy(lastMessage = message))
+                _conversations.add(item.copy(lastMessage = message))
             }
 
         } else {
             displayWrongPinMessage?.invoke()
 
-            navController?.popBackStack()
+            back()
         }
     }
 
+    private fun back() {
+        navController?.popBackStack()
+    }
 
-    fun newChat() {
+
+    fun newConversation() {
+
+    }
+
+    fun dismiss() {
+        pin = null
+        back()
+    }
+
+    fun conversationClick(conversation: ConversationModel) {
 
     }
 
