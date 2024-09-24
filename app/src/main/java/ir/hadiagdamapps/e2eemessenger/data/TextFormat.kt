@@ -18,4 +18,7 @@ object TextFormat {
         SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(timeStamp))
 
 
+    fun isValidLabel(text: String): Boolean = true // TODO
+
+
 }
