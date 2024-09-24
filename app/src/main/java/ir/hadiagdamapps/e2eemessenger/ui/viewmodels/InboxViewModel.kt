@@ -35,11 +35,17 @@ class InboxViewModel : ViewModel() {
     var pinDialogError: String? by mutableStateOf(null)
         private set
 
-    private var privateKey: String? = null
+    var isOptionsMenuOpen by mutableStateOf(false)
+        private set
 
-    private var displayWrongPinMessage: (() -> Unit)? = null
+    var confirmDeleteDialogContent: ConversationModel? by mutableStateOf(null)
+        private set
 
-    private var aesKey: SecretKey? = null
+    var sharePublicKeyDialogContent: InboxDialogModel? by mutableStateOf(null)
+        private set
+
+    var editLabelDialogText: String? by mutableStateOf(null)
+        private set
 
 
     // TODO user should enter pin to generate private key first
@@ -120,5 +126,54 @@ class InboxViewModel : ViewModel() {
     fun conversationClick(conversation: ConversationModel) {
 
     }
+
+    fun newConversation() {
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    fun conversationDetailsClick(conversation: ConversationModel) {
+
+    }
+
+    fun optionsMenuItemClick(item: MenuItem) {
+        when (item) {
+            menuOptions[0] -> TODO("copy")
+            menuOptions[1] -> TODO("edit")
+            menuOptions[2] -> TODO("delete")
+        }
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    fun labelChanged(newLabel: String) {
+        if (isValidLabel(newLabel))
+            editLabelDialogText = newLabel
+    }
+
+    fun saveLabelClick() {
+
+    }
+
+    fun dismissEditLabelDialog() {
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    fun dismissDeleteDialog() {
+
+    }
+
+    fun okDeleteDialog() {
+
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+
+
 
 }

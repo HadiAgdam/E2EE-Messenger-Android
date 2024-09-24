@@ -14,16 +14,16 @@ import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.InboxViewModel
 
 @Composable
 fun InboxScreen(viewModel: InboxViewModel) {
-    Screen(
-        title = "Inbox",
-        fabClick = viewModel::newConversation
-    ) {
+
+    val state = rememberBottomSheetScaffoldState()
+
+    Screen(title = "Inbox", fabClick = viewModel::newConversation, content = {
         LazyColumn {
             items(viewModel.conversations) { conversation: ConversationModel ->
                 ConversationItem(
                     modifier = Modifier.clickable { viewModel.conversationClick(conversation) },
                     label = conversation.label,
-                    detailsClick = { viewModel.conversationClick(conversation) },
+                    detailsClick = { viewModel.conversationDetailsClick(conversation) },
                     lastMessageText = (if (conversation.lastMessage.sent) "You: " else "") + conversation.lastMessage.text,
                     timeText = TextFormat.timestampToText(conversation.lastMessage.timestamp)
                 )
@@ -38,5 +38,32 @@ fun InboxScreen(viewModel: InboxViewModel) {
             okClick = viewModel::pinSubmitClick,
             dismiss = viewModel::dismiss
         )
-    }
+
+        if (viewModel.confirmDeleteDialogContent != null) ConfirmDeleteDialog(
+            onOkClick = viewModel::okDeleteDialog, onCancelClick = viewModel::dismissDeleteDialog
+        )
+
+        if (viewModel.sharePublicKeyDialogContent != null) SharePublicKeyDialog(
+            qrCode = viewModel.sharePublicKeyDialogContent!!.qrCode,
+            publicKey = viewModel.sharePublicKeyDialogContent!!.dialogPublicKey,
+            copyClick = {}
+        )
+
+
+    }, scaffoldState = state, sheetContent = {
+
+        if (viewModel.isOptionsMenuOpen) BottomSheetMenu(
+            items = viewModel.menuOptions, onItemClick = viewModel::optionsMenuItemClick
+        )
+
+
+        if (viewModel.editLabelDialogText != null) EditLabelBottomSheet(
+            text = viewModel.editLabelDialogText!!,
+            onOkClick = viewModel::saveLabelClick,
+            onCancelClick = viewModel::dismissEditLabelDialog,
+            onTextChange = viewModel::labelChanged
+        )
+
+
+    })
 }
