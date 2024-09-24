@@ -37,13 +37,12 @@ fun InboxScreen(viewModel: InboxViewModel) {
             }
         }
 
-
         if (viewModel.pin != null) PinDialog(
             pin = viewModel.pin!!,
             onPinChanged = viewModel::pinChanged,
             error = viewModel.pinDialogError,
             okClick = viewModel::pinSubmitClick,
-            dismiss = viewModel::dismiss
+            dismiss = viewModel::dismissPinDialog
         )
 
         if (viewModel.confirmDeleteDialogContent != null) ConfirmDeleteDialog(

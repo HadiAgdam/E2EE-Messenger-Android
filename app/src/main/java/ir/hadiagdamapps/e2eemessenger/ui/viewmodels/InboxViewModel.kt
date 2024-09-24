@@ -9,22 +9,34 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
+import ir.hadiagdamapps.e2eemessenger.R
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat.PIN_LENGTH
+import ir.hadiagdamapps.e2eemessenger.data.TextFormat.isValidLabel
 import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
+import ir.hadiagdamapps.e2eemessenger.data.models.InboxDialogModel
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
+import ir.hadiagdamapps.e2eemessenger.data.models.MenuItem
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.InboxScreenRoute
 import javax.crypto.SecretKey
 
 
 class InboxViewModel : ViewModel() {
 
+    private var displayWrongPinMessage: (() -> Unit)? = null
+    private var aesKey: SecretKey? = null
+    private var privateKey: String? = null
     private var inbox: InboxModel? = null
     private var navController: NavHostController? = null
     private var data: ConversationData? = null
+    val menuOptions = listOf(
+        MenuItem("copy public key", R.drawable.copy_icon),
+        MenuItem("edit label", R.drawable.edit_icon),
+        MenuItem("delete", R.drawable.delete_icon)
+    )
 
     private val _conversations = mutableStateListOf<ConversationModel>()
     val conversations: SnapshotStateList<ConversationModel> = _conversations
@@ -62,6 +74,41 @@ class InboxViewModel : ViewModel() {
     }
 
 
+    private fun loadMessages() {
+        if (privateKey != null) {
+            aesKey = AesKeyGenerator.generateKey(pin!!, inbox?.salt!!)
+
+            inbox?.inboxId?.let { data?.loadConversations(inboxId = it) }
+
+            val list = data?.loadConversations(inboxId = inbox?.inboxId!!)!!
+
+            _conversations.clear()
+            for (item in list) {
+                val message = item.lastMessage.copy(
+                    text = AesEncryptor.decryptMessage(
+                        item.lastMessage.text,
+                        aesKey!!,
+                        inbox?.iv!!
+                    )!!
+                )
+
+                _conversations.add(item.copy(lastMessage = message))
+            }
+
+        } else {
+            displayWrongPinMessage?.invoke()
+
+            back()
+        }
+    }
+
+
+    private fun back() {
+        navController?.popBackStack()
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
     fun pinChanged(newPin: String) {
         if (newPin.length < PIN_LENGTH + 1) {
             pin = newPin
@@ -83,45 +130,12 @@ class InboxViewModel : ViewModel() {
         } else pinDialogError = "invalid pin format"
 
 
-    private fun loadMessages() {
-        if (privateKey != null) {
-            aesKey = AesKeyGenerator.generateKey(pin!!, inbox?.salt!!)
-
-            inbox?.inboxId?.let { data?.loadConversations(inboxId = it) }
-
-            val list = data?.loadConversations(inboxId = inbox?.inboxId!!)!!
-
-            _conversations.clear()
-            for (item in list) {
-                val message = item.lastMessage.copy(text = AesEncryptor.decryptMessage(
-                    item.lastMessage.text,
-                    aesKey!!,
-                    inbox?.iv!!
-                )!!)
-
-                _conversations.add(item.copy(lastMessage = message))
-            }
-
-        } else {
-            displayWrongPinMessage?.invoke()
-
-            back()
-        }
-    }
-
-    private fun back() {
-        navController?.popBackStack()
-    }
-
-
-    fun newConversation() {
-
-    }
-
-    fun dismiss() {
+    fun dismissPinDialog() {
         pin = null
         back()
     }
+
+    // ---------------------------------------------------------------------------------------------
 
     fun conversationClick(conversation: ConversationModel) {
 
