@@ -3,15 +3,22 @@ package ir.hadiagdamapps.e2eemessenger.ui.screens
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
 import ir.hadiagdamapps.e2eemessenger.ui.components.ConversationItem
 import ir.hadiagdamapps.e2eemessenger.ui.components.Screen
+import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.BottomSheetMenu
+import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.ConfirmDeleteDialog
+import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.EditLabelBottomSheet
 import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.PinDialog
+import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.SharePublicKeyDialog
 import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.InboxViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InboxScreen(viewModel: InboxViewModel) {
 

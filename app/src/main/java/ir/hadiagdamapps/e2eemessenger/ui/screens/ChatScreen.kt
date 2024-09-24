@@ -2,6 +2,7 @@ package ir.hadiagdamapps.e2eemessenger.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,6 +12,7 @@ import ir.hadiagdamapps.e2eemessenger.ui.components.Screen
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.ChatScreenRoute
 import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.ChatScreenViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatScreenViewModel) {
 
