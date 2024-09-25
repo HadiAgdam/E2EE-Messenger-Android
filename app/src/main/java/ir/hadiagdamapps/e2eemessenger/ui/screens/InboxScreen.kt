@@ -45,7 +45,7 @@ fun InboxScreen(viewModel: InboxViewModel) {
             dismiss = viewModel::dismissPinDialog
         )
 
-        if (viewModel.confirmDeleteDialogContent != null) ConfirmDeleteDialog(
+        if (viewModel.isConfirmDeleteDialogOpen) ConfirmDeleteDialog(
             onOkClick = viewModel::okDeleteDialog, onCancelClick = viewModel::dismissDeleteDialog
         )
 

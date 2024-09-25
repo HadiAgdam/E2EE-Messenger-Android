@@ -10,4 +10,17 @@ class ConversationData (private val context: Context) {
         return listOf()
     }
 
+
+    fun getSenderPublicKey(conversationId: Int): String {
+        TODO()
+    }
+
+    fun updateLabel(conversationId: Int, newLabel: String) {
+        TODO()
+    }
+
+    fun delete(conversationId: Int) {
+        TODO()
+    }
+
 }

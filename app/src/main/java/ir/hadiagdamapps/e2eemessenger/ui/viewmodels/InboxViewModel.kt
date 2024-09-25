@@ -10,6 +10,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import ir.hadiagdamapps.e2eemessenger.R
+import ir.hadiagdamapps.e2eemessenger.data.Clipboard
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat.PIN_LENGTH
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat.isValidLabel
@@ -47,10 +48,13 @@ class InboxViewModel : ViewModel() {
     var pinDialogError: String? by mutableStateOf(null)
         private set
 
+
+    private var optionsMenuContent: ConversationModel? by mutableStateOf(null)
+
     var isOptionsMenuOpen by mutableStateOf(false)
         private set
 
-    var confirmDeleteDialogContent: ConversationModel? by mutableStateOf(null)
+    var isConfirmDeleteDialogOpen by mutableStateOf(false)
         private set
 
     var editLabelDialogText: String? by mutableStateOf(null)
@@ -83,9 +87,7 @@ class InboxViewModel : ViewModel() {
             for (item in list) {
                 val message = item.lastMessage.copy(
                     text = AesEncryptor.decryptMessage(
-                        item.lastMessage.text,
-                        aesKey!!,
-                        inbox?.iv!!
+                        item.lastMessage.text, aesKey!!, inbox?.iv!!
                     )!!
                 )
 
@@ -114,17 +116,14 @@ class InboxViewModel : ViewModel() {
     }// I think I should create a handler to avoid duplication
 
 
-    fun pinSubmitClick() =
-        if (TextFormat.isValidPin(pin)) {
-            inbox?.let {
-                privateKey = AesEncryptor.decryptMessage(
-                    it.encryptedPrivateKey,
-                    AesKeyGenerator.generateKey(pin!!, it.salt!!),
-                    it.iv!!
-                )
-                loadMessages()
-            }
-        } else pinDialogError = "invalid pin format"
+    fun pinSubmitClick() = if (TextFormat.isValidPin(pin)) {
+        inbox?.let {
+            privateKey = AesEncryptor.decryptMessage(
+                it.encryptedPrivateKey, AesKeyGenerator.generateKey(pin!!, it.salt!!), it.iv!!
+            )
+            loadMessages()
+        }
+    } else pinDialogError = "invalid pin format"
 
 
     fun dismissPinDialog() {
@@ -145,46 +144,57 @@ class InboxViewModel : ViewModel() {
     // ---------------------------------------------------------------------------------------------
 
     fun conversationDetailsClick(conversation: ConversationModel) {
-
+        optionsMenuContent = conversation
+        isOptionsMenuOpen = true
     }
 
     fun optionsMenuItemClick(item: MenuItem) {
         when (item) {
-            menuOptions[0] -> TODO("copy")
-            menuOptions[1] -> TODO("edit")
-            menuOptions[2] -> TODO("delete")
-        }
 
+            menuOptions[0] -> {
+                Clipboard.copy(
+                    data?.getSenderPublicKey(
+                        (optionsMenuContent ?: return).id
+                    ) ?: return
+                )
+                optionsMenuContent = null
+            }
+
+            menuOptions[1] -> editLabelDialogText = optionsMenuContent?.label
+
+            menuOptions[2] -> isConfirmDeleteDialogOpen = true
+        }
+        isOptionsMenuOpen = false
     }
 
     // ---------------------------------------------------------------------------------------------
 
     fun labelChanged(newLabel: String) {
-        if (isValidLabel(newLabel))
-            editLabelDialogText = newLabel
+        if (isValidLabel(newLabel)) editLabelDialogText = newLabel
+        optionsMenuContent = null
     }
 
     fun saveLabelClick() {
-
+        data?.updateLabel(optionsMenuContent!!.id, editLabelDialogText!!)
+        optionsMenuContent = null
     }
 
     fun dismissEditLabelDialog() {
-
+        editLabelDialogText = null
+        optionsMenuContent = null
     }
 
     // ---------------------------------------------------------------------------------------------
 
     fun dismissDeleteDialog() {
-
+        isConfirmDeleteDialogOpen = false
+        optionsMenuContent = null
     }
 
     fun okDeleteDialog() {
-
+        data?.delete(optionsMenuContent!!.id)
+        optionsMenuContent = null
     }
 
     // ---------------------------------------------------------------------------------------------
-
-
-
-
 }
