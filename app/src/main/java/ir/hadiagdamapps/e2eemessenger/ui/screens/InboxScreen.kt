@@ -49,14 +49,6 @@ fun InboxScreen(viewModel: InboxViewModel) {
             onOkClick = viewModel::okDeleteDialog, onCancelClick = viewModel::dismissDeleteDialog
         )
 
-        if (viewModel.sharePublicKeyDialogContent != null) SharePublicKeyDialog(
-            qrCode = viewModel.sharePublicKeyDialogContent!!.qrCode,
-            publicKey = viewModel.sharePublicKeyDialogContent!!.dialogPublicKey,
-            copyClick = {},
-            dismiss = {}
-        )
-
-
     }, scaffoldState = state, sheetContent = {
 
         if (viewModel.isOptionsMenuOpen) BottomSheetMenu(

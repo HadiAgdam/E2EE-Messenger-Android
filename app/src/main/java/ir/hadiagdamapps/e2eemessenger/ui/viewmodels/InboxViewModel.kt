@@ -53,9 +53,6 @@ class InboxViewModel : ViewModel() {
     var confirmDeleteDialogContent: ConversationModel? by mutableStateOf(null)
         private set
 
-    var sharePublicKeyDialogContent: InboxDialogModel? by mutableStateOf(null)
-        private set
-
     var editLabelDialogText: String? by mutableStateOf(null)
         private set
 
