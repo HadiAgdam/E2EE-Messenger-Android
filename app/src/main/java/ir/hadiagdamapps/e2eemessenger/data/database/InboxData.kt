@@ -26,7 +26,7 @@ class InboxData(context: Context) :
     }
 
     fun delete(publicKey: String) =
-        1 == writableDatabase.delete(table.tableName, "inbox_public_key = ?", arrayOf(publicKey))
+        1 == writableDatabase.delete(table.tableName, "$INBOX_PUBLIC_KEY = ?", arrayOf(publicKey))
 
     fun delete(model: InboxModel) = delete(model.publicKey)
 
@@ -58,7 +58,7 @@ class InboxData(context: Context) :
         values.put(IV.toString(), model.iv)
 
         val db = writableDatabase
-        model=model.copy( inboxId = db.insert(table.tableName, null, values))
+        model = model.copy(inboxId = db.insert(table.tableName, null, values))
         db.close()
 
 
@@ -89,11 +89,12 @@ class InboxData(context: Context) :
 
 
     fun updateLabel(publicKey: String, label: String) {
-        val values = ContentValues()
-
-        values.put(LABEL.toString(), label)
-
-        writableDatabase.update(table.tableName, values, "inbox_public_key = ?", arrayOf(publicKey))
+        writableDatabase.update(
+            table.tableName,
+            ContentValues().apply { put(LABEL.toString(), label) },
+            "$INBOX_PUBLIC_KEY = ?",
+            arrayOf(publicKey)
+        )
     }
 
     // -------------------------------------------------------------------
