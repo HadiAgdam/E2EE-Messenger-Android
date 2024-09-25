@@ -52,7 +52,8 @@ fun InboxScreen(viewModel: InboxViewModel) {
         if (viewModel.sharePublicKeyDialogContent != null) SharePublicKeyDialog(
             qrCode = viewModel.sharePublicKeyDialogContent!!.qrCode,
             publicKey = viewModel.sharePublicKeyDialogContent!!.dialogPublicKey,
-            copyClick = {}
+            copyClick = {},
+            dismiss = {}
         )
 
 
