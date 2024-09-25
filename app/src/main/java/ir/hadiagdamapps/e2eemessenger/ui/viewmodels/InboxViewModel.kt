@@ -152,11 +152,12 @@ class InboxViewModel : ViewModel() {
         when (item) {
 
             menuOptions[0] -> {
-                Clipboard.copy(
-                    data?.getSenderPublicKey(
-                        (optionsMenuContent ?: return).id
-                    ) ?: return
-                )
+//                Clipboard.copy(
+//                    data?.getSenderPublicKey(
+//                        (optionsMenuContent ?: return).id
+//                    ) ?: return
+//                )
+                Clipboard.copy((optionsMenuContent ?: return).senderPublicKey)
                 optionsMenuContent = null
             }
 
