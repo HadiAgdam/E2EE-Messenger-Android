@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ir.hadiagdamapps.e2eemessenger.ui.components.Screen
+import ir.hadiagdamapps.e2eemessenger.ui.components.widgets.TextButton
 import ir.hadiagdamapps.e2eemessenger.ui.theme.ColorPalette
 import ir.hadiagdamapps.e2eemessenger.ui.theme.E2EEMessengerTheme
 import ir.hadiagdamapps.e2eemessenger.ui.theme.Typography
@@ -85,23 +86,9 @@ fun PinDialog(
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Button(
-                onClick = dismiss,
-                shape = RectangleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-            ) {
-                Text(
-                    text = "CANCEL", color = Color.Cyan,
-                )
-            }
+            TextButton(text = "cancel", onClick = dismiss)
 
-            Button(
-                onClick = okClick,
-                shape = RectangleShape,
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-            ) {
-                Text(text = "OK", color = Color.Cyan)
-            }
+            TextButton(text = "ok", onClick = okClick)
         }
     })
 
