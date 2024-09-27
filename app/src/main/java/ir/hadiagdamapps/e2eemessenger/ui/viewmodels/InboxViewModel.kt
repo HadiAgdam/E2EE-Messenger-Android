@@ -21,6 +21,7 @@ import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxDialogModel
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
 import ir.hadiagdamapps.e2eemessenger.data.models.MenuItem
+import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.ChatScreenRoute
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.InboxScreenRoute
 import javax.crypto.SecretKey
 
@@ -37,6 +38,10 @@ class InboxViewModel : ViewModel() {
         MenuItem("copy public key", R.drawable.copy_icon),
         MenuItem("edit label", R.drawable.edit_icon),
         MenuItem("delete", R.drawable.delete_icon)
+    )
+    val newConversationMenuOptions = listOf(
+        MenuItem("get from clipboard", R.drawable.copy_icon),
+        MenuItem("scan QR code", R.drawable.scan_qr_code_icon)
     )
 
     private val _conversations = mutableStateListOf<ConversationModel>()
@@ -58,6 +63,9 @@ class InboxViewModel : ViewModel() {
         private set
 
     var editLabelDialogText: String? by mutableStateOf(null)
+        private set
+
+    var isNewConversationDialogOpen by mutableStateOf(false)
         private set
 
 
@@ -134,12 +142,7 @@ class InboxViewModel : ViewModel() {
     // ---------------------------------------------------------------------------------------------
 
     fun conversationClick(conversation: ConversationModel) {
-        data?.clearUnseen(conversation.id)
-        // TODO ("open the chat screen with passing conversation / chat")
-    }
-
-    fun newConversation() {
-
+        openConversationScreen(conversation.senderPublicKey)
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -194,4 +197,39 @@ class InboxViewModel : ViewModel() {
     }
 
     // ---------------------------------------------------------------------------------------------
+
+
+    fun openNewConversationDialog() {
+        isNewConversationDialogOpen = true
+    }
+
+    fun newConversationMenuItemClick(item: MenuItem) {
+        when (item) {
+            newConversationMenuOptions[0] -> newConversation(Clipboard.readClipboard())
+            newConversationMenuOptions[1] -> TODO("get public key from Qr code and create a new conversation")
+        }
+        isOptionsMenuOpen = false
+    }
+
+
+    private fun newConversation(publicKey: String) {
+        if (TextFormat.isValidPublicKey(publicKey))
+        // a new conversation is going to created when user sends first message.
+            openConversationScreen(publicKey)
+        else {
+            TODO("create a snackBar or show toast message that says wrong public key")
+        }
+    }
+
+
+    private fun openConversationScreen(conversationPublicKey: String) {
+        data?.clearUnseen(conversationPublicKey)
+        navController?.navigate(
+            ChatScreenRoute(
+                publicKey = inbox!!.publicKey,
+                privateKey = privateKey!!,
+                recipientPublicKey = conversationPublicKey
+            )
+        )
+    }
 }

@@ -21,4 +21,7 @@ object TextFormat {
     fun isValidLabel(text: String): Boolean = true // TODO
 
 
+    fun isValidPublicKey(text: String): Boolean {
+        TODO()
+    }
 }

@@ -6,4 +6,8 @@ object Clipboard {
     fun copy(text: String) {
         TODO()
     }
+
+    fun readClipboard(): String {
+        TODO("read the content of clipboard")
+    }
 }

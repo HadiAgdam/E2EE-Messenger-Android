@@ -51,7 +51,7 @@ class ConversationData(context: Context) :
         )
     }
 
-    fun clearUnseen(conversationId: Int) {
+    fun clearUnseen(publicKey: String) {
         TODO("set the conversation unseen messages count to 0")
     }
 

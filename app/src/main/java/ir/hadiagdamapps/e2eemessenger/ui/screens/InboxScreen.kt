@@ -24,7 +24,7 @@ fun InboxScreen(viewModel: InboxViewModel) {
 
     val state = rememberBottomSheetScaffoldState()
 
-    Screen(title = "Inbox", fabClick = viewModel::newConversation, content = {
+    Screen(title = "Inbox", fabClick = viewModel::openNewConversationDialog, content = {
         LazyColumn {
             items(viewModel.conversations) { conversation: ConversationModel ->
                 ConversationItem(
@@ -33,7 +33,7 @@ fun InboxScreen(viewModel: InboxViewModel) {
                     detailsClick = { viewModel.conversationDetailsClick(conversation) },
                     lastMessageText = (if (conversation.lastMessage.sent) "You: " else "") + conversation.lastMessage.text,
                     timeText = TextFormat.timestampToText(conversation.lastMessage.timestamp),
-                    unseenMessagesCount =  conversation.unseenMessageCount
+                    unseenMessagesCount = conversation.unseenMessageCount
                 )
             }
         }
@@ -64,6 +64,9 @@ fun InboxScreen(viewModel: InboxViewModel) {
             onTextChange = viewModel::labelChanged
         )
 
-
+        if (viewModel.isNewConversationDialogOpen) BottomSheetMenu(
+            items = viewModel.newConversationMenuOptions,
+            onItemClick = viewModel::newConversationMenuItemClick
+        )
     })
 }
