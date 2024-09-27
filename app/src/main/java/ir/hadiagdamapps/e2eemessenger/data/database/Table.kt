@@ -18,7 +18,8 @@ enum class Table(
                 ${InboxesTableColumns.INBOX_PRIVATE_KEY} TEXT NOT NULL,
                 ${InboxesTableColumns.LABEL} TEXT,
                 ${InboxesTableColumns.IV} TEXT,
-                ${InboxesTableColumns.SALT} TEXT
+                ${InboxesTableColumns.SALT} TEXT,
+                ${InboxesTableColumns.UNSEEN_MESSAGE_COUNT} INTEGER
             )
             """,
         dropQuery = "DROP TABLE IF EXISTS inboxes",
@@ -48,6 +49,7 @@ enum class Table(
                 ${ConversationsTableColumns.SENDER_PUBLIC_KEY} NOT NULL UNIQUE,
                 ${ConversationsTableColumns.LAST_MESSAGE_ID} INTEGER,
                 ${ConversationsTableColumns.LABEL} TEXT,
+                ${ConversationsTableColumns.UNSEEN_MESSAGE_COUNT} INTEGER,
                 FOREIGN KEY (${ConversationsTableColumns.INBOX_ID}) PREFERENCES ${INBOXES.tableName}(${InboxesTableColumns.INBOX_ID}),
                 FOREIGN KEY (${ConversationsTableColumns.LAST_MESSAGE_ID}) PREFERENCES ${MESSAGES.tableName}(${MessagesTableColumn.MESSAGE_ID})
             

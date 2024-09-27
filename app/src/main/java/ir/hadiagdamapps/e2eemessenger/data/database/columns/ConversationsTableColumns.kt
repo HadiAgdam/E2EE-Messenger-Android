@@ -5,7 +5,8 @@ enum class ConversationsTableColumns {
     INBOX_ID,
     SENDER_PUBLIC_KEY, // other person in conversation
     LAST_MESSAGE_ID,
-    LABEL;
+    LABEL,
+    UNSEEN_MESSAGE_COUNT;
 
     override fun toString() = name.lowercase()
 }

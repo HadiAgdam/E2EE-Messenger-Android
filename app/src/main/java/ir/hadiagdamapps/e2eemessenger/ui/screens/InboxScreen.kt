@@ -32,7 +32,8 @@ fun InboxScreen(viewModel: InboxViewModel) {
                     label = conversation.label,
                     detailsClick = { viewModel.conversationDetailsClick(conversation) },
                     lastMessageText = (if (conversation.lastMessage.sent) "You: " else "") + conversation.lastMessage.text,
-                    timeText = TextFormat.timestampToText(conversation.lastMessage.timestamp)
+                    timeText = TextFormat.timestampToText(conversation.lastMessage.timestamp),
+                    unseenMessagesCount =  conversation.unseenMessageCount
                 )
             }
         }

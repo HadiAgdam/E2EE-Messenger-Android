@@ -134,7 +134,8 @@ class InboxViewModel : ViewModel() {
     // ---------------------------------------------------------------------------------------------
 
     fun conversationClick(conversation: ConversationModel) {
-
+        data?.clearUnseen(conversation.id)
+        // TODO ("open the chat screen with passing conversation / chat")
     }
 
     fun newConversation() {
@@ -152,11 +153,6 @@ class InboxViewModel : ViewModel() {
         when (item) {
 
             menuOptions[0] -> {
-//                Clipboard.copy(
-//                    data?.getSenderPublicKey(
-//                        (optionsMenuContent ?: return).id
-//                    ) ?: return
-//                )
                 Clipboard.copy((optionsMenuContent ?: return).senderPublicKey)
                 optionsMenuContent = null
             }

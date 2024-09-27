@@ -48,7 +48,8 @@ class InboxData(context: Context) :
             publicKey = pair.public.encoded.toText(),
             encryptedPrivateKey = privateKey,
             salt = salt,
-            iv = iv
+            iv = iv,
+            unseenMessageCount = 0
         )
 
         values.put(INBOX_PUBLIC_KEY.toString(), model.publicKey)
@@ -78,7 +79,8 @@ class InboxData(context: Context) :
                     encryptedPrivateKey = c.getString(2),
                     label = c.getString(3),
                     salt = c.getString(4),
-                    iv = c.getString(5)
+                    iv = c.getString(5),
+                    unseenMessageCount = c.getInt(6)
                 )
             )
         while (c.moveToNext())
@@ -95,6 +97,10 @@ class InboxData(context: Context) :
             "$INBOX_PUBLIC_KEY = ?",
             arrayOf(publicKey)
         )
+    }
+
+    fun clearUnseen(publicKey: String) {
+        TODO("set the conversation unseen messages count to 0")
     }
 
     // -------------------------------------------------------------------

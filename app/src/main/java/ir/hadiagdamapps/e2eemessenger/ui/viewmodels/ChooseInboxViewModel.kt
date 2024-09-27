@@ -103,6 +103,7 @@ class ChooseInboxViewModel : ViewModel() {
     // ---------------------------------------------------------------------------------------
 
     fun inboxClick(inbox: InboxModel) {
+        data?.clearUnseen(inbox.publicKey)
         navController?.navigate(
             inbox
         )

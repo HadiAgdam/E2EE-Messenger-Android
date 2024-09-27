@@ -9,5 +9,6 @@ data class InboxModel(
     val encryptedPrivateKey: String, // AES encrypted
     var label: String = publicKey.replace("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE", ""),
     val salt: String? = null,
-    val iv: String? = null
+    val iv: String? = null,
+    val unseenMessageCount: Int
 )

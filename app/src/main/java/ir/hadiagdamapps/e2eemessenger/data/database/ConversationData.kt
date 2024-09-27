@@ -25,7 +25,8 @@ class ConversationData(context: Context) :
                     id = c.getLong(0).toInt(),
                     label = c.getString(4),
                     lastMessage = localMessageData.getMessageById(c.getLong(3)),
-                    senderPublicKey = c.getString(2)
+                    senderPublicKey = c.getString(2),
+                    unseenMessageCount = c.getInt(5)
                 )
             )
         } while (c.moveToNext())
@@ -48,6 +49,10 @@ class ConversationData(context: Context) :
         writableDatabase.delete(
             table.tableName, "$CONVERSATION_ID = ?", arrayOf(conversationId.toString())
         )
+    }
+
+    fun clearUnseen(conversationId: Int) {
+        TODO("set the conversation unseen messages count to 0")
     }
 
     override fun onCreate(db: SQLiteDatabase?) {

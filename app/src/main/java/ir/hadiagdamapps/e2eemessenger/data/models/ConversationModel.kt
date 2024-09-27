@@ -5,4 +5,5 @@ data class ConversationModel(
     val label: String,
     val lastMessage:  LocalMessageModel,
     val senderPublicKey: String,
+    val unseenMessageCount: Int
 )
