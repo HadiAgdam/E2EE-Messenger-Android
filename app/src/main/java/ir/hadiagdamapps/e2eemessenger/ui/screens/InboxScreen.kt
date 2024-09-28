@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
@@ -23,6 +25,10 @@ import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.InboxViewModel
 fun InboxScreen(viewModel: InboxViewModel) {
 
     val state = rememberBottomSheetScaffoldState()
+
+    LaunchedEffect(viewModel.isPolling) {
+        if (viewModel.isPolling) viewModel.startPolling()
+    }
 
     Screen(title = "Inbox", fabClick = viewModel::openNewConversationDialog, content = {
         LazyColumn {

@@ -10,5 +10,6 @@ data class InboxModel(
     var label: String = publicKey.replace("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE", ""),
     val salt: String? = null,
     val iv: String? = null,
-    val unseenMessageCount: Int
+    val unseenMessageCount: Int,
+    val lastMessageId: Int,
 )

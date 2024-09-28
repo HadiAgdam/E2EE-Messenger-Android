@@ -8,9 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import ir.hadiagdamapps.e2eemessenger.R
 import ir.hadiagdamapps.e2eemessenger.data.Clipboard
+import ir.hadiagdamapps.e2eemessenger.data.IncomingMessageHandler
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat.PIN_LENGTH
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat.isValidLabel
@@ -18,16 +20,19 @@ import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
-import ir.hadiagdamapps.e2eemessenger.data.models.InboxDialogModel
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
 import ir.hadiagdamapps.e2eemessenger.data.models.MenuItem
+import ir.hadiagdamapps.e2eemessenger.data.network.ApiService
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.ChatScreenRoute
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.InboxScreenRoute
+import kotlinx.coroutines.launch
 import javax.crypto.SecretKey
 
 
 class InboxViewModel : ViewModel() {
 
+    private var incomingMessageHandler: IncomingMessageHandler? = null
+    private var apiService: ApiService? = null
     private var displayWrongPinMessage: (() -> Unit)? = null
     private var aesKey: SecretKey? = null
     private var privateKey: String? = null
@@ -68,11 +73,19 @@ class InboxViewModel : ViewModel() {
     var isNewConversationDialogOpen by mutableStateOf(false)
         private set
 
+    var isPolling by mutableStateOf(false)
+        private set
+
 
     // TODO user should enter pin to generate private key first
 
     // Dear future me, please forgive me. I know this is wrong but I don't know any better way.
-    fun init(navController: NavHostController, inbox: InboxScreenRoute, context: Context) {
+    fun init(
+        navController: NavHostController,
+        inbox: InboxScreenRoute,
+        context: Context,
+        apiService: ApiService
+    ) {
         this.inbox = inbox
         this.navController = navController
         displayWrongPinMessage = {
@@ -80,10 +93,12 @@ class InboxViewModel : ViewModel() {
             Toast.makeText(context, "wrong pin", Toast.LENGTH_SHORT).show()
         }
         this.data = ConversationData(context)
+        this.apiService = apiService
+        this.incomingMessageHandler = IncomingMessageHandler(context)
     }
 
 
-    private fun loadMessages() {
+    private fun loadConversations() {
         if (privateKey != null) {
             aesKey = AesKeyGenerator.generateKey(pin!!, inbox?.salt!!)
 
@@ -129,7 +144,8 @@ class InboxViewModel : ViewModel() {
             privateKey = AesEncryptor.decryptMessage(
                 it.encryptedPrivateKey, AesKeyGenerator.generateKey(pin!!, it.salt!!), it.iv!!
             )
-            loadMessages()
+            loadConversations()
+            isPolling = true
         }
     } else pinDialogError = "invalid pin format"
 
@@ -232,4 +248,26 @@ class InboxViewModel : ViewModel() {
             )
         )
     }
+
+
+    // ---------------------------------------------------------------------------------------------
+
+    fun startPolling() {
+        viewModelScope.launch {
+            while (true) {
+                try { // just making it unreadable I guess (why ?)
+                    val newMessages = incomingMessageHandler?.gotNewMessages(
+                        apiService?.getMessage(
+                            inbox!!.lastMessageId, inbox!!.publicKey
+                        ) ?: continue, privateKey!!, inbox!!.inboxId
+                    ) ?: continue
+
+                    loadConversations()
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                }
+            }
+        }
+    }
+
 }
