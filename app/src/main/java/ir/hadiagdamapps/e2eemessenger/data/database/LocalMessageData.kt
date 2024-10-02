@@ -23,7 +23,7 @@ class LocalMessageData(private val context: Context) :
 
         if (c.moveToFirst()) {
             val model = LocalMessageModel(
-                messageId = c.getInt(0),
+                messageId = c.getLong(0),
                 conversationId = c.getInt(1),
                 text = c.getString(2),
                 timestamp = c.getLong(3),
