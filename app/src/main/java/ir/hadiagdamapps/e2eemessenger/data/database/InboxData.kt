@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import ir.hadiagdamapps.e2eemessenger.data.database.columns.InboxesTableColumns
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.InboxesTableColumns.*
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
@@ -49,7 +50,8 @@ class InboxData(context: Context) :
             encryptedPrivateKey = privateKey,
             salt = salt,
             iv = iv,
-            unseenMessageCount = 0
+            unseenMessageCount = 0,
+            lastMessageId = 0 // zero is right
         )
 
         values.put(INBOX_PUBLIC_KEY.toString(), model.publicKey)
@@ -78,9 +80,10 @@ class InboxData(context: Context) :
                     publicKey = c.getString(1),
                     encryptedPrivateKey = c.getString(2),
                     label = c.getString(3),
-                    salt = c.getString(4),
-                    iv = c.getString(5),
-                    unseenMessageCount = c.getInt(6)
+                    salt = c.getString(5),
+                    iv = c.getString(4),
+                    unseenMessageCount = c.getInt(6),
+                    lastMessageId = c.getInt(7)
                 )
             )
         while (c.moveToNext())
@@ -89,18 +92,22 @@ class InboxData(context: Context) :
         return result
     }
 
-
     fun updateLabel(publicKey: String, label: String) {
         writableDatabase.update(
             table.tableName,
-            ContentValues().apply { put(LABEL.toString(), label) },
+            ContentValues().apply { put(LABEL, label) },
             "$INBOX_PUBLIC_KEY = ?",
             arrayOf(publicKey)
         )
     }
 
     fun clearUnseen(publicKey: String) {
-        TODO("set the conversation unseen messages count to 0")
+        writableDatabase.update(
+            table.tableName,
+            ContentValues().apply { put(UNSEEN_MESSAGE_COUNT, 0) },
+            "$INBOX_PUBLIC_KEY = ?",
+            arrayOf(publicKey)
+        )
     }
 
     // -------------------------------------------------------------------
@@ -113,4 +120,12 @@ class InboxData(context: Context) :
         db?.execSQL(table.dropQuery)
         onCreate(db)
     }
+}
+
+private fun ContentValues.put(key: InboxesTableColumns, value: Int) {
+    put(key.toString(), value)
+}
+
+private fun ContentValues.put(key: InboxesTableColumns, value: String) {
+    put(key.toString(), value)
 }

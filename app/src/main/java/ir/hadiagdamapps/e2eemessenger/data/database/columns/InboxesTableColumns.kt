@@ -7,7 +7,9 @@ enum class InboxesTableColumns {
     LABEL,
     IV,
     SALT,
-    UNSEEN_MESSAGE_COUNT;
+    UNSEEN_MESSAGE_COUNT,
+    LAST_MESSAGE_ID,
+    ;
 
     override fun toString() = name.lowercase()
 

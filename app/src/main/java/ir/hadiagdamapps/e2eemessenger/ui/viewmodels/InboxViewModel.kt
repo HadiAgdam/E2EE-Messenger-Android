@@ -1,6 +1,7 @@
 package ir.hadiagdamapps.e2eemessenger.ui.viewmodels
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -25,6 +26,7 @@ import ir.hadiagdamapps.e2eemessenger.data.models.MenuItem
 import ir.hadiagdamapps.e2eemessenger.data.network.ApiService
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.ChatScreenRoute
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.InboxScreenRoute
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.crypto.SecretKey
 
@@ -145,6 +147,7 @@ class InboxViewModel : ViewModel() {
                 it.encryptedPrivateKey, AesKeyGenerator.generateKey(pin!!, it.salt!!), it.iv!!
             )
             loadConversations()
+            pin = null
             isPolling = true
         }
     } else pinDialogError = "invalid pin format"
@@ -261,11 +264,15 @@ class InboxViewModel : ViewModel() {
                             inbox!!.lastMessageId, inbox!!.publicKey
                         ) ?: continue, privateKey!!, inbox!!.inboxId
                     ) ?: continue
-
-                    loadConversations()
+                    if (newMessages.isNotEmpty())
+                        loadConversations()
+                    Log.e("poll", newMessages.size.toString())
                 } catch (ex: Exception) {
                     ex.printStackTrace()
+                    Log.e("poll", "failed")
                 }
+                delay(5000)  // Wait for 5 seconds before polling again
+
             }
         }
     }

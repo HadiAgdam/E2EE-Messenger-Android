@@ -4,9 +4,7 @@ import ir.hadiagdamapps.e2eemessenger.data.database.columns.*
 
 
 enum class Table(
-    val tableName: String,
-    val createQuery: String,
-    val dropQuery: String,
+    val tableName: String, val createQuery: String, val dropQuery: String
 ) {
     INBOXES(
         tableName = "inboxes",
@@ -19,7 +17,8 @@ enum class Table(
                 ${InboxesTableColumns.LABEL} TEXT,
                 ${InboxesTableColumns.IV} TEXT,
                 ${InboxesTableColumns.SALT} TEXT,
-                ${InboxesTableColumns.UNSEEN_MESSAGE_COUNT} INTEGER
+                ${InboxesTableColumns.UNSEEN_MESSAGE_COUNT} INTEGER,
+                ${InboxesTableColumns.LAST_MESSAGE_ID} INTEGER
             )
             """,
         dropQuery = "DROP TABLE IF EXISTS inboxes",
