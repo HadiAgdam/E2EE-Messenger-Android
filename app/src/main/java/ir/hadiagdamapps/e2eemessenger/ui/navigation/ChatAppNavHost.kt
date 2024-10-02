@@ -12,6 +12,7 @@ import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.InboxViewModel
 
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.toRoute
+import ir.hadiagdamapps.e2eemessenger.data.network.RetrofitInstance
 import ir.hadiagdamapps.e2eemessenger.ui.screens.ChatScreen
 import ir.hadiagdamapps.e2eemessenger.ui.screens.ChooseInboxScreen
 import ir.hadiagdamapps.e2eemessenger.ui.screens.InboxScreen
@@ -34,7 +35,7 @@ fun ChatAppNavHost(navController: NavHostController, context: Context) {
             val args = it.toRoute<InboxScreenRoute>()
 
             val viewModel: InboxViewModel = viewModel()
-            viewModel.init(navController, args, context)
+            viewModel.init(navController, args, context, RetrofitInstance.api)
 
             InboxScreen(viewModel = viewModel)
         }
