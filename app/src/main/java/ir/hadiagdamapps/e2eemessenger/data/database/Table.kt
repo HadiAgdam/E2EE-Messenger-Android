@@ -38,27 +38,24 @@ enum class Table(
                 FOREIGN KEY (${LocalMessagesTableColumn.CONVERSATION_ID}) PREFERENCES conversations(${ConversationsTableColumns.CONVERSATION_ID})
             )
             
-        """,
-        dropQuery = "DROP IF EXISTS messages"
+        """, dropQuery = "DROP TABLE IF EXISTS messages"
     ),
 
     CONVERSATIONS(
-    tableName = "conversations",
-    createQuery = """
+        tableName = "conversations", createQuery = """
             CREATE TABLE conversations (
-            
                 ${ConversationsTableColumns.CONVERSATION_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
                 ${ConversationsTableColumns.INBOX_ID} INTEGER NOT NULL,
-                ${ConversationsTableColumns.SENDER_PUBLIC_KEY} NOT NULL UNIQUE,
+                ${ConversationsTableColumns.SENDER_PUBLIC_KEY} TEXT NOT NULL UNIQUE,
                 ${ConversationsTableColumns.LAST_MESSAGE_ID} INTEGER,
                 ${ConversationsTableColumns.LABEL} TEXT,
                 ${ConversationsTableColumns.UNSEEN_MESSAGE_COUNT} INTEGER,
-                FOREIGN KEY (${ConversationsTableColumns.INBOX_ID}) PREFERENCES ${INBOXES.tableName}(${InboxesTableColumns.INBOX_ID}),
-                FOREIGN KEY (${ConversationsTableColumns.LAST_MESSAGE_ID}) PREFERENCES ${LOCAL_MESSAGES.tableName}(${LocalMessagesTableColumn.MESSAGE_ID})
+                FOREIGN KEY (${ConversationsTableColumns.INBOX_ID}) REFERENCES ${INBOXES.tableName}(${InboxesTableColumns.INBOX_ID}),
+                FOREIGN KEY (${ConversationsTableColumns.LAST_MESSAGE_ID}) REFERENCES ${LOCAL_MESSAGES.tableName}(${LocalMessagesTableColumn.MESSAGE_ID})
+            )
+
             
-            
-        """.trimIndent(),
-    dropQuery = "DROP TABLE if EXISTS conversation"
+        """.trimIndent(), dropQuery = "DROP TABLE IF EXISTS conversations"
     ),
 
 }
