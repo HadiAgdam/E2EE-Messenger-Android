@@ -28,7 +28,7 @@ class EncryptionTest {
 
 
         val aesKey = AesKeyGenerator.generateKey()
-        val encryptedAesKey = E2EEncryptor.encryptAESKeyWithPublicKey(aesKey, pair.public)
+        val encryptedAesKey = E2EEncryptor.encryptAESKeyWithPublicKey(aesKey, pair.public.encoded.toText())
 
         println("aes key : ${aesKey.encoded.toText()}")
         println("encrypted Aes key : $encryptedAesKey")
@@ -40,7 +40,7 @@ class EncryptionTest {
         println("encrypted message : $encryptedMessage")
         println("iv : $iv")
 
-        val decryptedAesKey = E2EEncryptor.decryptAESKeyWithPrivateKey(encryptedAesKey, pair.private)
+        val decryptedAesKey = E2EEncryptor.decryptAESKeyWithPrivateKey(encryptedAesKey, pair.private.encoded.toText())
 
         val decryptedMessage = AesEncryptor.decryptMessage(encryptedMessage, decryptedAesKey, iv)
 
