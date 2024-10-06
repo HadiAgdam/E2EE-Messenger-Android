@@ -1,4 +1,4 @@
-package ir.hadiagdamapps.e2eemessenger.data.models
+package ir.hadiagdamapps.e2eemessenger.data.models.messages
 
 data class LocalMessageModel (
     val messageId: Long, // don't know if needed

@@ -254,9 +254,9 @@ class InboxViewModel : ViewModel() {
         data?.clearUnseen(conversationPublicKey)
         navController?.navigate(
             ChatScreenRoute(
-                publicKey = inbox!!.publicKey,
+                inboxId = inbox!!.inboxId,
                 privateKey = privateKey!!,
-                recipientPublicKey = conversationPublicKey
+                senderPublicKey = inbox!!.publicKey
             )
         )
     }
