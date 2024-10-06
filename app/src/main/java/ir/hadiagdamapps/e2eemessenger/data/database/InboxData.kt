@@ -4,11 +4,14 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.InboxesTableColumns
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.InboxesTableColumns.*
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
+import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EEncryptor
+import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EEncryptor.toText
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator.toText
 
@@ -35,18 +38,17 @@ class InboxData(context: Context) :
         val values = ContentValues()
 
         var pair = E2EKeyGenerator.generateKeyPair()
-        while (isPublicKeyExists(pair.public.encoded.toText()))
+        while (isPublicKeyExists(pair.public.toText()))
             pair = E2EKeyGenerator.generateKeyPair()
 
         val salt = AesKeyGenerator.generateSalt()
         val aesKey = AesKeyGenerator.generateKey(pin, salt)
 
-        val (privateKey, iv) = AesEncryptor.encryptMessage(pair.private.encoded.toText(), aesKey)
-
+        val (privateKey, iv) = AesEncryptor.encryptMessage(pair.private.toText(), aesKey)
 
         var model = InboxModel(
             inboxId = 0,
-            publicKey = pair.public.encoded.toText(),
+            publicKey = pair.public.toText(),
             encryptedPrivateKey = privateKey,
             salt = salt,
             iv = iv,

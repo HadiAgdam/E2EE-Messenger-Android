@@ -7,7 +7,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
@@ -17,7 +16,6 @@ import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.BottomSheetMenu
 import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.ConfirmDeleteDialog
 import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.EditLabelBottomSheet
 import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.PinDialog
-import ir.hadiagdamapps.e2eemessenger.ui.components.dialog.SharePublicKeyDialog
 import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.InboxViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,8 +42,8 @@ fun InboxScreen(viewModel: InboxViewModel) {
             }
         }
 
-        if (viewModel.pin != null) PinDialog(
-            pin = viewModel.pin!!,
+        if (viewModel.pinDialogContent != null) PinDialog(
+            pin = viewModel.pinDialogContent!!,
             onPinChanged = viewModel::pinChanged,
             error = viewModel.pinDialogError,
             okClick = viewModel::pinSubmitClick,

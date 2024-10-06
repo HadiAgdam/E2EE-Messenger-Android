@@ -1,12 +1,14 @@
 package ir.hadiagdamapps.e2eemessenger.data
 
 import android.content.Context
+import android.util.Log
 import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
 import ir.hadiagdamapps.e2eemessenger.data.database.InboxData
 import ir.hadiagdamapps.e2eemessenger.data.database.LocalMessageData
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EEncryptor
+import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.models.LocalMessageModel
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.IncomingMessage
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.MessageContent
@@ -20,6 +22,7 @@ import java.security.PrivateKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
 import java.util.Base64
+import javax.crypto.SecretKey
 
 
 class IncomingMessageHandler(context: Context) {
@@ -30,16 +33,25 @@ class IncomingMessageHandler(context: Context) {
 
     // it should be called when got new messages from web polling
     fun gotNewMessages(
-        response: Response<List<IncomingMessage>>, privateKey: String, inboxId: Long
+        response: Response<List<IncomingMessage>>,
+        privateKey: String,
+        inboxId: Long,
+        aesKey: SecretKey
     ): List<LocalMessageModel> {
 
         val result = ArrayList<LocalMessageModel>()
-
+        Log.e("response body length", response.body()!!.size.toString())
         if (response.isSuccessful) {
             for (message in response.body()!!) {
                 try {
+                    Log.e("encryption key", message.encryptionKey)
+
                     val key =
-                        E2EEncryptor.decryptAESKeyWithPrivateKey(message.encryptionKey, privateKey)
+                        E2EEncryptor.decryptAESKeyWithPrivateKey(
+                            message.encryptionKey,
+                            E2EKeyGenerator.getPrivateKeyFromString(privateKey)
+                        )
+
                     val messageData = JSONObject(
                         AesEncryptor.decryptMessage(message.encryptedMessage, key, message.iv)
                             ?: throw Exception("Text format invalid")
@@ -52,12 +64,14 @@ class IncomingMessageHandler(context: Context) {
                             ?: conversationData.newConversation(
                                 inboxId = inboxId, publicKey = content.senderPublicKey
                             )
-
+                    val encryptedMessage = AesEncryptor.encryptMessage(content.text, aesKey)
                     val newMessageId = localMessageData.insertNewMessage(
-                        conversationId, content.text, message.time.toLong(), false
+                        conversationId, encryptedMessage.first, message.time.toLong(), false, encryptedMessage.second
                     )
 
+
                     conversationData.updateLastMessage(conversationId, newMessageId)
+                    conversationData.incrementUnseenCount(conversationId)
 
                     result.add(
                         LocalMessageModel(
@@ -71,7 +85,7 @@ class IncomingMessageHandler(context: Context) {
                     )
 
                 } catch (ex: Exception) {
-                    continue
+                    throw ex
                 }
             }
         }

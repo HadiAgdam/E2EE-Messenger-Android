@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.ConversationsTableColumns
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.LocalMessagesTableColumn
 import ir.hadiagdamapps.e2eemessenger.data.models.LocalMessageModel
@@ -41,13 +42,15 @@ class LocalMessageData(private val context: Context) :
         conversationId: Int,
         text: String,
         timestamp: Long,
-        sent: Boolean
+        sent: Boolean,
+        iv: String
     ): Long {
         return writableDatabase.insert(table.tableName, null, ContentValues().apply {
             put(CONVERSATION_ID, conversationId)
             put(TEXT, text)
             put(TIME_STAMP, timestamp)
             put(SENT, sent)
+            put(IV, iv)
         })
     }
 

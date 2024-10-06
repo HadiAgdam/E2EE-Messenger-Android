@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.ConversationsTableColumns
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.ConversationsTableColumns.*
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
@@ -29,8 +30,14 @@ class ConversationData(context: Context) :
                     lastMessage = localMessageData.getMessageById(c.getLong(3)) ?: continue,
                     senderPublicKey = c.getString(2),
                     unseenMessageCount = c.getInt(5)
-                )
+                ).apply {
+                    Log.e(
+                        "last message text-------------------------------------",
+                        lastMessage.text
+                    )
+                }
             )
+
         } while (c.moveToNext())
 
         c.close()
@@ -86,29 +93,62 @@ class ConversationData(context: Context) :
             put(INBOX_ID, inboxId)
             put(SENDER_PUBLIC_KEY, publicKey)
             put(
-                LABEL,
-                publicKey.replace("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE", "")
+                LABEL, publicKey.replace("MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE", "")
             ) // This is wrong
         }).toInt()
     }
 
     fun updateLastMessage(
-        conversationId: Int,
-        newLastMessageId: Long
+        conversationId: Int, newLastMessageId: Long
     ) {
-        writableDatabase.update(
-            table.tableName,
-            ContentValues().apply { put(LAST_MESSAGE_ID, newLastMessageId) },
-            "$CONVERSATION_ID = ?",
-            arrayOf(conversationId.toString())
+        writableDatabase.apply {
+            update(
+                table.tableName,
+                ContentValues().apply { put(LAST_MESSAGE_ID, newLastMessageId) },
+                "$CONVERSATION_ID = ?",
+                arrayOf(conversationId.toString())
+            )
+            close()
+        }
+    }
+
+    fun incrementUnseenCount(conversationId: Int) {
+        val count = getUnseenCount(conversationId) + 1
+        Log.e("incremented", count.toString())
+        writableDatabase.apply {
+            update(
+                table.tableName,
+                ContentValues().apply { put(UNSEEN_MESSAGE_COUNT, count) },
+                "$CONVERSATION_ID = ?",
+                arrayOf(conversationId.toString())
+            )
+            close()
+        }
+    }
+
+    private fun getUnseenCount(conversationId: Int): Int {
+        val c = readableDatabase.rawQuery(
+            "SELECT * FROM ${table.tableName} where $CONVERSATION_ID = ?", arrayOf(conversationId.toString())
         )
+
+        if (c.moveToFirst()) {
+            val count = c.getInt(5)
+            c.close()
+            return count
+        }
+
+
+        c.close()
+        return -1
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
+        Log.e("position", "create")
         db?.execSQL(table.createQuery)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        Log.e("position", "update")
         db?.execSQL(table.dropQuery)
         onCreate(db)
     }

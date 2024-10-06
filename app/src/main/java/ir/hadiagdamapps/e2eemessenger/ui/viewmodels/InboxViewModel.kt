@@ -20,6 +20,9 @@ import ir.hadiagdamapps.e2eemessenger.data.TextFormat.isValidLabel
 import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
+import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EEncryptor
+import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
+import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator.toText
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
 import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
 import ir.hadiagdamapps.e2eemessenger.data.models.MenuItem
@@ -54,8 +57,11 @@ class InboxViewModel : ViewModel() {
     private val _conversations = mutableStateListOf<ConversationModel>()
     val conversations: SnapshotStateList<ConversationModel> = _conversations
 
-    var pin: String? by mutableStateOf("")
+    var pinDialogContent: String? by mutableStateOf("")
         private set
+
+    private var pin: String? by mutableStateOf(null)
+
 
     var pinDialogError: String? by mutableStateOf(null)
         private set
@@ -110,9 +116,11 @@ class InboxViewModel : ViewModel() {
 
             _conversations.clear()
             for (item in list) {
+                Log.e("unseen message count", item.unseenMessageCount.toString())
+
                 val message = item.lastMessage.copy(
                     text = AesEncryptor.decryptMessage(
-                        item.lastMessage.text, aesKey!!, inbox?.iv!!
+                        item.lastMessage.text, aesKey!!, item.lastMessage.iv
                     )!!
                 )
 
@@ -135,26 +143,27 @@ class InboxViewModel : ViewModel() {
 
     fun pinChanged(newPin: String) {
         if (newPin.length < PIN_LENGTH + 1) {
-            pin = newPin
+            pinDialogContent = newPin
             pinDialogError = null
         }
     }// I think I should create a handler to avoid duplication
 
 
-    fun pinSubmitClick() = if (TextFormat.isValidPin(pin)) {
+    fun pinSubmitClick() = if (TextFormat.isValidPin(pinDialogContent)) {
         inbox?.let {
             privateKey = AesEncryptor.decryptMessage(
-                it.encryptedPrivateKey, AesKeyGenerator.generateKey(pin!!, it.salt!!), it.iv!!
+                it.encryptedPrivateKey, AesKeyGenerator.generateKey(pinDialogContent!!, it.salt!!), it.iv!!
             )
+            pin = pinDialogContent
+            pinDialogContent = null
             loadConversations()
-            pin = null
             isPolling = true
         }
     } else pinDialogError = "invalid pin format"
 
 
     fun dismissPinDialog() {
-        pin = null
+        pinDialogContent = null
         back()
     }
 
@@ -256,22 +265,47 @@ class InboxViewModel : ViewModel() {
     // ---------------------------------------------------------------------------------------------
 
     fun startPolling() {
+
+        val keyPair = E2EKeyGenerator.generateKeyPair()
+        val aesKey = AesKeyGenerator.generateKey()
+
+        Log.e("encryptionKey json", E2EEncryptor.encryptAESKeyWithPublicKey(aesKey, E2EKeyGenerator.getPublicKeyFromString(inbox!!.publicKey)))
+        AesEncryptor.encryptMessage(
+            """
+            
+            {
+                "sender_public_key": "${keyPair.public.toText()}",
+                "text": "Hello Hello Hello"
+            }
+            
+            
+            """.trimIndent(), aesKey
+        ).apply {
+            Log.e("encrypted message json", first)
+            Log.e("iv json", second)
+        }
+
         viewModelScope.launch {
             while (true) {
                 try { // just making it unreadable I guess (why ?)
                     val newMessages = incomingMessageHandler?.gotNewMessages(
                         apiService?.getMessage(
-                            inbox!!.lastMessageId, inbox!!.publicKey
-                        ) ?: continue, privateKey!!, inbox!!.inboxId
+                            inbox!!.lastMessageId,
+                            inbox!!.publicKey
+                        ) ?: continue,
+                        privateKey!!,
+                        inbox!!.inboxId
+                        , AesKeyGenerator.generateKey(
+                            pin!!,
+                            inbox?.salt!!)
                     ) ?: continue
-                    if (newMessages.isNotEmpty())
-                        loadConversations()
-                    Log.e("poll", newMessages.size.toString())
+                    if (newMessages.isNotEmpty()) loadConversations()
                 } catch (ex: Exception) {
+                    throw ex
                     ex.printStackTrace()
                     Log.e("poll", "failed")
                 }
-                delay(5000)  // Wait for 5 seconds before polling again
+                delay(3000)  // Wait for 5 seconds before polling again
 
             }
         }

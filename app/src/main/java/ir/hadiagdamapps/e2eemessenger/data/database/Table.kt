@@ -28,14 +28,14 @@ enum class Table(
         tableName = "local_messages",
         createQuery = """
             
-            CREATE TABLE messages (
+            CREATE TABLE local_messages (
                 ${LocalMessagesTableColumn.MESSAGE_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
                 ${LocalMessagesTableColumn.CONVERSATION_ID} INTEGER NOT NULL,
                 ${LocalMessagesTableColumn.TEXT} TEXT,
                 ${LocalMessagesTableColumn.TIME_STAMP} LONG,
                 ${LocalMessagesTableColumn.SENT} BOOLEAN,
                 ${LocalMessagesTableColumn.IV} TEXT,
-                FOREIGN KEY (${LocalMessagesTableColumn.CONVERSATION_ID}) PREFERENCES conversations(${ConversationsTableColumns.CONVERSATION_ID})
+                FOREIGN KEY (${LocalMessagesTableColumn.CONVERSATION_ID}) REFERENCES conversations(${ConversationsTableColumns.CONVERSATION_ID})
             )
             
         """, dropQuery = "DROP TABLE IF EXISTS messages"
