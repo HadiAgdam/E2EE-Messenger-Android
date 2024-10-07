@@ -152,7 +152,9 @@ class InboxViewModel : ViewModel() {
     fun pinSubmitClick() = if (TextFormat.isValidPin(pinDialogContent)) {
         inbox?.let {
             privateKey = AesEncryptor.decryptMessage(
-                it.encryptedPrivateKey, AesKeyGenerator.generateKey(pinDialogContent!!, it.salt!!), it.iv!!
+                it.encryptedPrivateKey,
+                AesKeyGenerator.generateKey(pinDialogContent!!, it.salt!!),
+                it.iv!!
             )
             pin = pinDialogContent
             pinDialogContent = null
@@ -256,7 +258,11 @@ class InboxViewModel : ViewModel() {
             ChatScreenRoute(
                 inboxId = inbox!!.inboxId,
                 privateKey = privateKey!!,
-                senderPublicKey = inbox!!.publicKey
+                senderPublicKey = conversationPublicKey,
+                aesKeyPin = pin!!,
+                aesKeySalt = inbox!!.salt!!,
+                conversationLabel =  inbox!!.label
+
             )
         )
     }
@@ -269,7 +275,13 @@ class InboxViewModel : ViewModel() {
         val keyPair = E2EKeyGenerator.generateKeyPair()
         val aesKey = AesKeyGenerator.generateKey()
 
-        Log.e("encryptionKey json", E2EEncryptor.encryptAESKeyWithPublicKey(aesKey, E2EKeyGenerator.getPublicKeyFromString(inbox!!.publicKey)))
+        Log.e(
+            "encryptionKey json",
+            E2EEncryptor.encryptAESKeyWithPublicKey(
+                aesKey,
+                E2EKeyGenerator.getPublicKeyFromString(inbox!!.publicKey)
+            )
+        )
         AesEncryptor.encryptMessage(
             """
             
@@ -294,10 +306,10 @@ class InboxViewModel : ViewModel() {
                             inbox!!.publicKey
                         ) ?: continue,
                         privateKey!!,
-                        inbox!!.inboxId
-                        , AesKeyGenerator.generateKey(
+                        inbox!!.inboxId, AesKeyGenerator.generateKey(
                             pin!!,
-                            inbox?.salt!!)
+                            inbox?.salt!!
+                        )
                     ) ?: continue
                     if (newMessages.isNotEmpty()) loadConversations()
                 } catch (ex: Exception) {

@@ -23,6 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import ir.hadiagdamapps.e2eemessenger.ui.theme.ColorPalette
 import ir.hadiagdamapps.e2eemessenger.ui.theme.Typography
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 private val boxPadding = 30.dp
 private const val oneLineLength = 20
@@ -45,12 +48,14 @@ fun ChatItem(
                 .padding(12.dp)
         ) {
             val show = text.length < oneLineLength
+            val dt = LocalDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), ZoneId.systemDefault())
+            val timeText = "${dt.hour}:${dt.minute}"
             Row(
                 horizontalArrangement = Arrangement.End
             ) {
                 if (sent) {
                     if (show) Text(
-                        text = "19:05",
+                        text = timeText,
                         color = Color.LightGray,
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -59,7 +64,7 @@ fun ChatItem(
                     ChatTextContent(text = text)
                     Spacer(modifier = Modifier.width(12.dp))
                     if (show) Text(
-                        text = "19:05",
+                        text = timeText,
                         color = Color.LightGray,
                     )
                 }
@@ -72,11 +77,6 @@ fun ChatItem(
             }
         }
     }
-}
-
-@Composable
-private fun ChatTimeDisplay(text: String) {
-
 }
 
 @Composable

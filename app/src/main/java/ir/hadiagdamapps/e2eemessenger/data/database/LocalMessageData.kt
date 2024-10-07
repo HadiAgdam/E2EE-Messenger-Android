@@ -4,22 +4,22 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
-import ir.hadiagdamapps.e2eemessenger.data.database.columns.ConversationsTableColumns
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.LocalMessagesTableColumn
-import ir.hadiagdamapps.e2eemessenger.data.models.LocalMessageModel
+import ir.hadiagdamapps.e2eemessenger.data.models.messages.LocalMessageModel
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.LocalMessagesTableColumn.*
+import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
+import ir.hadiagdamapps.e2eemessenger.data.models.messages.ChatMessageModel
+import javax.crypto.SecretKey
 
 
-class LocalMessageData(private val context: Context) :
+class LocalMessageData(context: Context) :
     SQLiteOpenHelper(context, MessengerDatabase.DB_NAME, null, MessengerDatabase.DB_VERSION) {
 
     private val table = Table.LOCAL_MESSAGES
 
     fun getMessageById(messageId: Long): LocalMessageModel? {
         val c = readableDatabase.rawQuery(
-            "SELECT * FROM ${table.tableName} where $MESSAGE_ID = ?",
-            arrayOf(messageId.toString())
+            "SELECT * FROM ${table.tableName} where $MESSAGE_ID = ?", arrayOf(messageId.toString())
         )
 
         if (c.moveToFirst()) {
@@ -39,11 +39,7 @@ class LocalMessageData(private val context: Context) :
     }
 
     fun insertNewMessage(
-        conversationId: Int,
-        text: String,
-        timestamp: Long,
-        sent: Boolean,
-        iv: String
+        conversationId: Int, text: String, timestamp: Long, sent: Boolean, iv: String
     ): Long {
         return writableDatabase.insert(table.tableName, null, ContentValues().apply {
             put(CONVERSATION_ID, conversationId)
@@ -52,6 +48,28 @@ class LocalMessageData(private val context: Context) :
             put(SENT, sent)
             put(IV, iv)
         })
+    }
+
+    fun getConversationMessages(conversationId: Int, aesKey: SecretKey): List<ChatMessageModel> {
+        val result = ArrayList<ChatMessageModel>()
+
+        val c = readableDatabase.rawQuery(
+            "SELECT $TEXT, $SENT, $TIME_STAMP, $IV FROM ${table.tableName} WHERE $CONVERSATION_ID = ?",
+            arrayOf(conversationId.toString())
+        )
+
+        if (c.moveToFirst()) do result.add(
+            ChatMessageModel(
+                text = AesEncryptor.decryptMessage(c.getString(0), aesKey, c.getString(3))
+                    ?: continue,
+                sent = c.getInt(1) == 1,
+                time = c.getLong(2)
+            )
+        )
+        while (c.moveToNext())
+
+        c.close()
+        return result
     }
 
     override fun onCreate(db: SQLiteDatabase?) {

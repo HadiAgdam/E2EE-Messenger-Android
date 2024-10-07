@@ -48,9 +48,8 @@ fun ChatBox(
             )
         },
         modifier = modifier
-            .fillMaxHeight(.1f)
-            .fillMaxWidth()
-            .padding(12.dp),
+            .padding(12.dp)
+            .fillMaxWidth(),
         shape = RoundedCornerShape(50),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = ColorPalette.secondary,

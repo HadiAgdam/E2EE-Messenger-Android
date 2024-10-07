@@ -44,7 +44,7 @@ fun ChatAppNavHost(navController: NavHostController, context: Context) {
             val args = it.toRoute<ChatScreenRoute>()
 
             val viewModel: ChatScreenViewModel = viewModel()
-            viewModel.init(args)
+            viewModel.init(args,  context)
 
             ChatScreen(viewModel = viewModel)
         }

@@ -1,6 +1,7 @@
 package ir.hadiagdamapps.e2eemessenger.ui.navigation.routes
 
 import kotlinx.serialization.Serializable
+import javax.crypto.SecretKey
 
 @Serializable
 data class ChatScreenRoute(
@@ -9,5 +10,8 @@ data class ChatScreenRoute(
 //    val recipientPublicKey: String,
     val inboxId: Long,
     val privateKey: String,
-    val senderPublicKey: String
+    val senderPublicKey: String,
+    val aesKeyPin: String,
+    val aesKeySalt: String,
+    val conversationLabel: String
 )

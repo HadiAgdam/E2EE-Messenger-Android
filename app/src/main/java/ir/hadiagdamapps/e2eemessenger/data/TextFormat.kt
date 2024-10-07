@@ -25,7 +25,7 @@ object TextFormat {
         TODO()
     }
 
-    fun isValidMessage(text: String): Boolean{
-        TODO("validate if the message user wants so send")
+    fun isValidMessage(text: String?): Boolean{
+        return text != null && text.length < 500 // TODO
     }
 }

@@ -3,9 +3,11 @@ package ir.hadiagdamapps.e2eemessenger.ui.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +28,19 @@ fun ChatScreen(viewModel: ChatScreenViewModel) {
         title = viewModel.conversationLabel,
     ) {
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+            ChatBox(
+                text = viewModel.chatBoxContent,
+                onValueChange = viewModel::chatBoxTextChange,
+                sendClick = viewModel::chatBoxSubmit
+            )
+        }) { padding ->
             var t = 0L
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(padding)
+            ) {
                 items(viewModel.chats) { // items should be sorted
 
                     if (!isSameDay(t, it.time)) {
@@ -38,11 +50,7 @@ fun ChatScreen(viewModel: ChatScreenViewModel) {
                     ChatItem(text = it.text, timeStamp = it.time, sent = it.sent)
                 }
             }
-            ChatBox(
-                text = viewModel.chatBoxContent,
-                onValueChange = viewModel::chatBoxTextChange,
-                sendClick = viewModel::chatBoxSubmit
-            )
+
 
         }
 
