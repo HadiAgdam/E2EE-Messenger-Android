@@ -58,5 +58,21 @@ enum class Table(
         """.trimIndent(), dropQuery = "DROP TABLE IF EXISTS conversations"
     ),
 
+    PENDING_MESSAGES(
+        tableName = "pending_messages", createQuery = """
+            CREATE TABLE pending_messages (
+            ${PendingMessagesColumn.PENDING_MESSAGE_ID} INTEGER PRIMARY KEY AUTOINCREMENT,
+            ${PendingMessagesColumn.INBOX_PUBLIC_KEY} TEXT NOT NULL,
+            ${PendingMessagesColumn.RECIPIENT_PUBLIC_KEY} TEXT NOT NULL,
+            ${PendingMessagesColumn.ENCRYPTED_KEY} TEXT NOT NULL,
+            ${PendingMessagesColumn.MESSAGE} TEXT NOT NULL,
+            ${PendingMessagesColumn.IV} TEXT NOT NULL,
+            ${PendingMessagesColumn.PREVIEW_TEXT} TEXT NOT NULL,
+            ${PendingMessagesColumn.PREVIEW_IV} TEXT NOT NULL,
+            )
+        """.trimIndent(),
+        dropQuery = "DROP TABLE IF EXISTS pending_messages"
+    )
+
 }
 

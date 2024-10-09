@@ -1,5 +1,6 @@
 package ir.hadiagdamapps.e2eemessenger.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -48,9 +49,9 @@ fun ChatBox(
             )
         },
         modifier = modifier
-            .padding(12.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(50),
+            .padding(bottom =  4.dp, start = 12.dp, end = 12.dp)
+            .fillMaxWidth().background(Color.Transparent),
+        shape = RoundedCornerShape(20),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = ColorPalette.secondary,
             unfocusedContainerColor = ColorPalette.secondary,
@@ -59,8 +60,8 @@ fun ChatBox(
             focusedTextColor = Color.White,
             unfocusedTextColor = ColorPalette.primary
         ),
-        maxLines = 1,
-        singleLine = true
+        maxLines = 3,
+        singleLine = false
     )
 }
 

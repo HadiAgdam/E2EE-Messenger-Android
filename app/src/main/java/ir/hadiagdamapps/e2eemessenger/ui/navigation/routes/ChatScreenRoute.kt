@@ -8,7 +8,7 @@ data class ChatScreenRoute(
 //    val publicKey: String,
 //    val privateKey: String,
 //    val recipientPublicKey: String,
-    val inboxId: Long,
+    val inboxPublicKey: String,
     val privateKey: String,
     val senderPublicKey: String,
     val aesKeyPin: String,

@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import ir.hadiagdamapps.e2eemessenger.ui.components.ChatBox
 import ir.hadiagdamapps.e2eemessenger.ui.components.ChatDateText
 import ir.hadiagdamapps.e2eemessenger.ui.components.ChatItem
+import ir.hadiagdamapps.e2eemessenger.ui.components.PendingChatItem
 import ir.hadiagdamapps.e2eemessenger.ui.components.Screen
 import ir.hadiagdamapps.e2eemessenger.ui.viewmodels.ChatScreenViewModel
 import java.time.Instant
@@ -50,12 +51,15 @@ fun ChatScreen(viewModel: ChatScreenViewModel) {
                     ChatItem(text = it.text, timeStamp = it.time, sent = it.sent)
                 }
             }
-
-
+            LazyColumn {
+                items(viewModel.pendingMessages) {
+                    PendingChatItem(text = it.second) {
+                        viewModel.cancelSending(it.first)
+                    }
+                }
+            }
         }
-
     }
-
 }
 
 
@@ -70,7 +74,7 @@ private fun isSameDay(t1: Long, t2: Long): Boolean {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun ChatScreenPreview() {
+private fun ChatScreenPreview() {
     Screen(
         title = "label",
     ) {

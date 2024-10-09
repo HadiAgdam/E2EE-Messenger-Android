@@ -27,8 +27,8 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-private val boxPadding = 30.dp
-private const val oneLineLength = 20
+val boxPadding = 30.dp
+const val oneLineLength = 20
 
 @Composable
 fun ChatItem(
@@ -37,7 +37,7 @@ fun ChatItem(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(12.dp)
+            .padding(horizontal =  12.dp, vertical = 4.dp)
             .padding(start = if (sent) boxPadding else 0.dp, end = if (sent) 0.dp else boxPadding),
         contentAlignment = if (sent) Alignment.CenterEnd else Alignment.CenterStart
     ) {
@@ -80,9 +80,9 @@ fun ChatItem(
 }
 
 @Composable
-private fun ChatTextContent(text: String) {
+fun ChatTextContent(text: String, modifier: Modifier = Modifier) {
     Text(
-        text = text, color = Color.White, style = Typography.bodyMedium
+        text = text, color = Color.White, style = Typography.bodyMedium, modifier = modifier
     )
 }
 
@@ -90,7 +90,7 @@ private fun ChatTextContent(text: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun ChatItemPreview() {
+private fun ChatItemPreview() {
     Screen(title = "Preview") {
         Column(
             modifier = Modifier
@@ -101,7 +101,7 @@ fun ChatItemPreview() {
             ChatItem(
                 text = "0000000000000000000000000",
                 timeStamp = System.currentTimeMillis(),
-                sent = false
+                sent = true
             )
         }
     }
