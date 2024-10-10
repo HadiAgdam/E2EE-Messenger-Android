@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import ir.hadiagdamapps.e2eemessenger.ui.components.ChatBox
@@ -24,6 +25,10 @@ import java.time.ZoneId
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatScreenViewModel) {
+
+    LaunchedEffect(key1 = viewModel.isPolling) {
+        if (viewModel.isPolling) viewModel.startPolling()
+    }
 
     Screen(
         title = viewModel.conversationLabel,

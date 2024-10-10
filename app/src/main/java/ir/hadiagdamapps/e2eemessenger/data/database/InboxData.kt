@@ -148,6 +148,13 @@ class InboxData(context: Context) :
         }
     }
 
+    fun getInboxById(inboxPublicKey: String): InboxModel? {
+        getInboxes().forEach {
+            if (it.publicKey == inboxPublicKey) return it
+        }
+        return null
+    }
+
     // -------------------------------------------------------------------
 
     override fun onCreate(db: SQLiteDatabase?) {

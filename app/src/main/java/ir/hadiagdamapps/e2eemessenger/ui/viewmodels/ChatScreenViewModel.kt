@@ -13,12 +13,14 @@ import ir.hadiagdamapps.e2eemessenger.data.IncomingMessageHandler
 import ir.hadiagdamapps.e2eemessenger.data.PendingMessageHandler
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
+import ir.hadiagdamapps.e2eemessenger.data.database.InboxData
 import ir.hadiagdamapps.e2eemessenger.data.database.LocalMessageData
 import ir.hadiagdamapps.e2eemessenger.data.database.PendingMessageData
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
+import ir.hadiagdamapps.e2eemessenger.data.models.InboxModel
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.ChatMessageModel
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.MessageContent
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.PendingPreviewMessageModel
@@ -31,18 +33,29 @@ class ChatScreenViewModel : ViewModel() {
 
     private var localMessageData: LocalMessageData? = null
     private var conversationData: ConversationData? = null
+    private var inboxData: InboxData? = null
     private var conversationId: Int? = null
-    private var inboxPublicKey: String? = null
+
+    //private var inboxPublicKey: String? = null
     private var privateKey: String? = null
     private var senderPublicKey: String? = null
     private var aesKey: SecretKey? = null
     private var pendingMessageHandler: PendingMessageHandler? = null
     private var apiService: ApiService? = null
+    private var incomingMessageHandler: IncomingMessageHandler? = null
+    private var inbox: InboxModel? = null
+    private var arguments: ChatScreenRoute? = null
+
 
     var chatBoxContent: String by mutableStateOf("")
         private set
+
     var conversationLabel: String by mutableStateOf("")
         private set
+
+    var isPolling: Boolean by mutableStateOf(false)
+        private set
+
 
     private var _chats = mutableStateListOf<ChatMessageModel>()
     var chats: SnapshotStateList<ChatMessageModel> = _chats
@@ -57,7 +70,7 @@ class ChatScreenViewModel : ViewModel() {
     fun chatBoxSubmit() {
 
         val messageContent = MessageContent(
-            senderPublicKey = inboxPublicKey!!, text = chatBoxContent
+            senderPublicKey = inbox!!.publicKey, text = chatBoxContent
         )
 
         val key = AesKeyGenerator.generateKey()
@@ -78,13 +91,15 @@ class ChatScreenViewModel : ViewModel() {
             previewIv = preview.second
         )
 
+        _pendingMessages.add(Pair(id, chatBoxContent)) // not sure
+
         chatBoxContent = ""
     }
 
-    private fun loadMessages(conversationId: Int, aesKey: SecretKey) {
+    private fun loadMessages() {
         _chats.clear()
         val newContent =
-            (localMessageData ?: return).getConversationMessages(conversationId, aesKey)
+            (localMessageData ?: return).getConversationMessages(conversationId!!, aesKey!!)
         Log.e("new content count", newContent.size.toString())
         for (content in newContent) _chats.add(content)
     }
@@ -101,16 +116,19 @@ class ChatScreenViewModel : ViewModel() {
     fun init(arguments: ChatScreenRoute, context: Context, apiService: ApiService) {
         localMessageData = LocalMessageData(context)
         conversationData = ConversationData(context)
+        inboxData = InboxData(context)
         conversationId =
             conversationData!!.getConversationIdByPublicKey(publicKey = arguments.senderPublicKey)
-        inboxPublicKey = arguments.inboxPublicKey
         privateKey = arguments.privateKey
         senderPublicKey = arguments.senderPublicKey
         aesKey = AesKeyGenerator.generateKey(arguments.aesKeyPin, arguments.aesKeySalt)
         conversationLabel = arguments.conversationLabel
         this.apiService = apiService
+        incomingMessageHandler = IncomingMessageHandler(context)
+        inbox = inboxData?.getInboxById(arguments.inboxPublicKey)
+        this.arguments = arguments
         pendingMessageHandler = object : PendingMessageHandler(
-            PendingMessageData(context), inboxPublicKey!!, senderPublicKey!!, apiService
+            PendingMessageData(context), inbox!!.publicKey, senderPublicKey!!, apiService
         ) {
             override fun messageSent(pendingMessageId: Int) {
                 for (message in _pendingMessages) if (message.first == pendingMessageId) _pendingMessages.remove(
@@ -133,7 +151,7 @@ class ChatScreenViewModel : ViewModel() {
 
         Log.e("conversation id", conversationId.toString())
 
-        if (conversationId != null) loadMessages(conversationId!!, aesKey!!)
+        if (conversationId != null) loadMessages()
         loadPendingMessages()
     }
 
@@ -142,6 +160,38 @@ class ChatScreenViewModel : ViewModel() {
         for (message in _pendingMessages) if (message.first == pendingMessageId) _pendingMessages.remove(
             message
         )
+    }
+
+    private fun stopPolling() {
+        isPolling = false
+    }
+
+    fun startPolling() {
+        isPolling = true
+        viewModelScope.launch {
+            while (isPolling) {
+                try {
+                    val newLastMessageId = incomingMessageHandler?.gotNewMessages(
+                        apiService?.getMessage(
+                            inbox!!.lastMessageId,
+                            inbox!!.publicKey
+                        ) ?: continue,
+                        privateKey!!,
+                        inbox!!.inboxId,
+                        AesKeyGenerator.generateKey(
+                            arguments!!.aesKeyPin,
+                            arguments!!.aesKeySalt
+                        )
+                    ) ?: continue
+                    inbox = inbox?.copy(lastMessageId = newLastMessageId)
+                    loadMessages()
+                } catch (ex: Exception) {
+                    // temp
+                    throw ex
+                }
+
+            }
+        }
     }
 
 }
