@@ -300,7 +300,7 @@ class InboxViewModel : ViewModel() {
         viewModelScope.launch {
             while (true) {
                 try { // just making it unreadable I guess (why ?)
-                    val newMessages = incomingMessageHandler?.gotNewMessages(
+                    val newLastMessageId = incomingMessageHandler?.gotNewMessages(
                         apiService?.getMessage(
                             inbox!!.lastMessageId,
                             inbox!!.publicKey
@@ -311,13 +311,13 @@ class InboxViewModel : ViewModel() {
                             inbox?.salt!!
                         )
                     ) ?: continue
-                    if (newMessages.isNotEmpty()) loadConversations()
+                    inbox = inbox?.copy(lastMessageId = newLastMessageId)
+                    loadConversations()
+
                 } catch (ex: Exception) {
                     throw ex
-                    ex.printStackTrace()
-                    Log.e("poll", "failed")
                 }
-                delay(3000)  // Wait for 5 seconds before polling again
+                delay(3000)  // Wait for 3 seconds before polling again
 
             }
         }

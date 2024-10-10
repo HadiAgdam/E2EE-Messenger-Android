@@ -95,12 +95,15 @@ class InboxData(context: Context) :
     }
 
     fun updateLabel(publicKey: String, label: String) {
-        writableDatabase.update(
-            table.tableName,
-            ContentValues().apply { put(LABEL, label) },
-            "$INBOX_PUBLIC_KEY = ?",
-            arrayOf(publicKey)
-        )
+        writableDatabase.apply {
+            update(
+                table.tableName,
+                ContentValues().apply { put(LABEL, label) },
+                "$INBOX_PUBLIC_KEY = ?",
+                arrayOf(publicKey)
+            )
+            close()
+        }
     }
 
     fun clearUnseen(publicKey: String) {
@@ -110,6 +113,39 @@ class InboxData(context: Context) :
             "$INBOX_PUBLIC_KEY = ?",
             arrayOf(publicKey)
         )
+    }
+
+    fun increaseUnseenMessageCount(inboxId: Long, increment: Int) {
+        readableDatabase.rawQuery(
+            "select $UNSEEN_MESSAGE_COUNT from ${table.tableName} where $INBOX_ID = ?",
+            arrayOf(inboxId.toString())
+        ).apply {
+            if (moveToFirst()) {
+                val count = getInt(0) + increment
+                writableDatabase.apply {
+                    update(
+                        table.tableName,
+                        ContentValues().apply { put(UNSEEN_MESSAGE_COUNT, count) },
+                        "$INBOX_ID = ?",
+                        arrayOf(inboxId.toString())
+                    )
+                    close()
+                }
+            }
+            this.close()
+        }
+    }
+
+    fun updateLastMessageId(inboxId: Long, lastMessageId: Int) {
+        writableDatabase.apply {
+            update(
+                table.tableName,
+                ContentValues().apply { put(LAST_MESSAGE_ID, lastMessageId) },
+                "$INBOX_ID = ?",
+                arrayOf(inboxId.toString())
+            )
+            close()
+        }
     }
 
     // -------------------------------------------------------------------

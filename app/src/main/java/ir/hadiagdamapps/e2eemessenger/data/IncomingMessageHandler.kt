@@ -3,6 +3,7 @@ package ir.hadiagdamapps.e2eemessenger.data
 import android.content.Context
 import android.util.Log
 import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
+import ir.hadiagdamapps.e2eemessenger.data.database.InboxData
 import ir.hadiagdamapps.e2eemessenger.data.database.LocalMessageData
 import ir.hadiagdamapps.e2eemessenger.data.encryption.aes.AesEncryptor
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EEncryptor
@@ -20,6 +21,7 @@ class IncomingMessageHandler(context: Context) {
 
     private val localMessageData = LocalMessageData(context)
     private val conversationData = ConversationData(context)
+    private val inboxData = InboxData(context)
 
 
     // it should be called when got new messages from web polling
@@ -28,9 +30,11 @@ class IncomingMessageHandler(context: Context) {
         privateKey: String,
         inboxId: Long,
         aesKey: SecretKey
-    ): List<LocalMessageModel> {
+    ): Int? {
 
-        val result = ArrayList<LocalMessageModel>()
+        var lastMessageId: Int? = null
+
+//        val result = ArrayList<LocalMessageModel>()
         Log.e("response body length", response.body()!!.size.toString())
         if (response.isSuccessful) {
             for (message in response.body()!!) {
@@ -57,31 +61,47 @@ class IncomingMessageHandler(context: Context) {
                             )
                     val encryptedMessage = AesEncryptor.encryptMessage(content.text, aesKey)
                     val newMessageId = localMessageData.insertNewMessage(
-                        conversationId, encryptedMessage.first, message.time.toLong(), false, encryptedMessage.second
+                        conversationId,
+                        encryptedMessage.first,
+                        message.time.toLong(),
+                        false,
+                        encryptedMessage.second
                     )
 
 
                     conversationData.updateLastMessage(conversationId, newMessageId)
                     conversationData.incrementUnseenCount(conversationId)
 
-                    result.add(
-                        LocalMessageModel(
-                            messageId = newMessageId,
-                            conversationId = conversationId,
-                            text = content.text,
-                            timestamp = message.time.toLong(),
-                            sent = false,
-                            iv = message.iv
-                        )
-                    )
+//                    result.add(
+//                        LocalMessageModel(
+//                            messageId = newMessageId,
+//                            conversationId = conversationId,
+//                            text = content.text,
+//                            timestamp = message.time.toLong(),
+//                            sent = false,
+//                            iv = message.iv
+//                        )
+//                    )
+
+                    if (message.messageId > (lastMessageId ?: 0))
+                        lastMessageId = message.messageId
+
 
                 } catch (ex: Exception) {
                     throw ex
                 }
             }
-        }
+            if (response.body() != null)
+                inboxData.increaseUnseenMessageCount(
+                    inboxId= inboxId,
+                    increment =  response.body()!!.size)
 
-        return result
+            if (lastMessageId != null)
+                inboxData.updateLastMessageId(
+                    inboxId = inboxId,
+                    lastMessageId = lastMessageId)
+        }
+        return lastMessageId
     }
 
 
