@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import ir.hadiagdamapps.e2eemessenger.data.IncomingMessageHandler
 import ir.hadiagdamapps.e2eemessenger.data.PendingMessageHandler
 import ir.hadiagdamapps.e2eemessenger.data.TextFormat
 import ir.hadiagdamapps.e2eemessenger.data.database.ConversationData
@@ -20,7 +22,9 @@ import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.ChatMessageModel
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.MessageContent
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.PendingPreviewMessageModel
+import ir.hadiagdamapps.e2eemessenger.data.network.ApiService
 import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.ChatScreenRoute
+import kotlinx.coroutines.launch
 import javax.crypto.SecretKey
 
 class ChatScreenViewModel : ViewModel() {
@@ -33,6 +37,7 @@ class ChatScreenViewModel : ViewModel() {
     private var senderPublicKey: String? = null
     private var aesKey: SecretKey? = null
     private var pendingMessageHandler: PendingMessageHandler? = null
+    private var apiService: ApiService? = null
 
     var chatBoxContent: String by mutableStateOf("")
         private set
@@ -93,7 +98,7 @@ class ChatScreenViewModel : ViewModel() {
         }
     }
 
-    fun init(arguments: ChatScreenRoute, context: Context) {
+    fun init(arguments: ChatScreenRoute, context: Context, apiService: ApiService) {
         localMessageData = LocalMessageData(context)
         conversationData = ConversationData(context)
         conversationId =
@@ -103,8 +108,9 @@ class ChatScreenViewModel : ViewModel() {
         senderPublicKey = arguments.senderPublicKey
         aesKey = AesKeyGenerator.generateKey(arguments.aesKeyPin, arguments.aesKeySalt)
         conversationLabel = arguments.conversationLabel
+        this.apiService = apiService
         pendingMessageHandler = object : PendingMessageHandler(
-            PendingMessageData(context), inboxPublicKey!!, senderPublicKey!!
+            PendingMessageData(context), inboxPublicKey!!, senderPublicKey!!, apiService
         ) {
             override fun messageSent(pendingMessageId: Int) {
                 for (message in _pendingMessages) if (message.first == pendingMessageId) _pendingMessages.remove(

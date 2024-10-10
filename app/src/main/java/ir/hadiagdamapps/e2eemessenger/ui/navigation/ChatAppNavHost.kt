@@ -44,7 +44,11 @@ fun ChatAppNavHost(navController: NavHostController, context: Context) {
             val args = it.toRoute<ChatScreenRoute>()
 
             val viewModel: ChatScreenViewModel = viewModel()
-            viewModel.init(args,  context)
+            viewModel.init(
+                arguments = args,
+                context = context,
+                apiService = RetrofitInstance.api
+            )
 
             ChatScreen(viewModel = viewModel)
         }
