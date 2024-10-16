@@ -42,8 +42,8 @@ fun InboxScreen(viewModel: InboxViewModel) {
             }
         }
 
-        if (viewModel.pinDialogContent != null) PinDialog(
-            pin = viewModel.pinDialogContent!!,
+        if (viewModel.showPinDialog) PinDialog(
+            pin = viewModel.pinDialogContent,
             onPinChanged = viewModel::pinChanged,
             error = viewModel.pinDialogError,
             okClick = viewModel::pinSubmitClick,
@@ -61,8 +61,8 @@ fun InboxScreen(viewModel: InboxViewModel) {
         )
 
 
-        if (viewModel.editLabelDialogText != null) EditLabelBottomSheet(
-            text = viewModel.editLabelDialogText!!,
+        if (viewModel.showEditLabelDialog) EditLabelBottomSheet(
+            text = viewModel.editLabelDialogText,
             onOkClick = viewModel::saveLabelClick,
             onCancelClick = viewModel::dismissEditLabelDialog,
             onTextChange = viewModel::labelChanged

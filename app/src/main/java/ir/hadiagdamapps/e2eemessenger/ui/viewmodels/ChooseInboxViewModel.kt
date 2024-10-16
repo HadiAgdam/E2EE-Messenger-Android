@@ -29,13 +29,16 @@ class ChooseInboxViewModel : ViewModel() {
     val inboxes: SnapshotStateList<InboxModel> = _inboxes
 
 
-    var pin: String? by mutableStateOf(null)
+    var pin: String by mutableStateOf("")
         private set
 
     var pinDialogError: String? by mutableStateOf(null)
         private set
 
     var inboxDialog: InboxDialogModel? by mutableStateOf(null)
+        private set
+
+    var showPinDialog: Boolean by mutableStateOf(false)
         private set
 
 
@@ -76,7 +79,8 @@ class ChooseInboxViewModel : ViewModel() {
     // ---------------------------------------------------------------------------------------
 
     fun pinDialogDismiss() {
-        pin = null
+        pin = ""
+        showPinDialog = false
         pinDialogError = null
     }
 
@@ -85,7 +89,6 @@ class ChooseInboxViewModel : ViewModel() {
             _inboxes.add(this)
             pinDialogDismiss()
             showInboxDialog(this)
-            // TODO PROBLEM : Pin dialog opens itself after closing
         } else pinDialogError = "invalid pin"
     }
 
@@ -97,7 +100,7 @@ class ChooseInboxViewModel : ViewModel() {
     }
 
     fun newInbox() {
-        pin = ""
+        showPinDialog = true
     }
 
     // ---------------------------------------------------------------------------------------

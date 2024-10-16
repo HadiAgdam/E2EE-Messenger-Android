@@ -57,7 +57,10 @@ class InboxViewModel : ViewModel() {
     private val _conversations = mutableStateListOf<ConversationModel>()
     val conversations: SnapshotStateList<ConversationModel> = _conversations
 
-    var pinDialogContent: String? by mutableStateOf("")
+    var pinDialogContent: String by mutableStateOf("")
+        private set
+
+    var showPinDialog: Boolean by mutableStateOf(true)
         private set
 
     private var pin: String? by mutableStateOf(null)
@@ -75,7 +78,10 @@ class InboxViewModel : ViewModel() {
     var isConfirmDeleteDialogOpen by mutableStateOf(false)
         private set
 
-    var editLabelDialogText: String? by mutableStateOf(null)
+    var editLabelDialogText: String by mutableStateOf("")
+        private set
+
+    var showEditLabelDialog: Boolean by mutableStateOf(false)
         private set
 
     var isNewConversationDialogOpen by mutableStateOf(false)
@@ -153,11 +159,12 @@ class InboxViewModel : ViewModel() {
         inbox?.let {
             privateKey = AesEncryptor.decryptMessage(
                 it.encryptedPrivateKey,
-                AesKeyGenerator.generateKey(pinDialogContent!!, it.salt!!),
+                AesKeyGenerator.generateKey(pinDialogContent, it.salt!!),
                 it.iv!!
             )
             pin = pinDialogContent
-            pinDialogContent = null
+            pinDialogContent = ""
+            showPinDialog = false
             loadConversations()
             isPolling = true
         }
@@ -165,7 +172,8 @@ class InboxViewModel : ViewModel() {
 
 
     fun dismissPinDialog() {
-        pinDialogContent = null
+        pinDialogContent = ""
+        showPinDialog = false
         back()
     }
 
@@ -190,7 +198,8 @@ class InboxViewModel : ViewModel() {
                 optionsMenuContent = null
             }
 
-            menuOptions[1] -> editLabelDialogText = optionsMenuContent?.label
+            menuOptions[1] ->{ editLabelDialogText = optionsMenuContent?.label!!
+            showEditLabelDialog = true}
 
             menuOptions[2] -> isConfirmDeleteDialogOpen = true
         }
@@ -205,12 +214,13 @@ class InboxViewModel : ViewModel() {
     }
 
     fun saveLabelClick() {
-        data?.updateLabel(optionsMenuContent!!.id, editLabelDialogText!!)
+        data?.updateLabel(optionsMenuContent!!.id, editLabelDialogText)
         optionsMenuContent = null
     }
 
     fun dismissEditLabelDialog() {
-        editLabelDialogText = null
+        editLabelDialogText = ""
+        showEditLabelDialog = false
         optionsMenuContent = null
     }
 

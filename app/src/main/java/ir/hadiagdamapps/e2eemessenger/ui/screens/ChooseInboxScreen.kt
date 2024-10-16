@@ -47,7 +47,7 @@ fun ChooseInboxScreen(viewModel: ChooseInboxViewModel) {
             labelValueChange = viewModel::inboxDialogLabelChange
         )
 
-        if (viewModel.pin != null) PinDialog(
+        if (viewModel.showPinDialog) PinDialog(
             pin = viewModel.pin!!,
             onPinChanged = viewModel::pinChanged,
             error = viewModel.pinDialogError,
