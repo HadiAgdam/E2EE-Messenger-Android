@@ -2,8 +2,6 @@ package ir.hadiagdamapps.e2eemessenger.data.database
 
 import android.content.ContentValues
 import android.content.Context
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.PendingMessagesColumn
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.PendingMessagesColumn.*
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.PendingMessageModel
@@ -47,8 +45,8 @@ class PendingMessageData(context: Context) : DatabaseHelper(context, Table.PENDI
                     "$MESSAGE," +
                     "$IV," +
                     "$PREVIEW_TEXT," +
-                    "$PREVIEW_IV," +
-                    "from ${table.tableName} where $INBOX_PUBLIC_KEY = ?, $RECIPIENT_PUBLIC_KEY = ? ",
+                    "$PREVIEW_IV " +
+                    "from ${table.tableName} where $INBOX_PUBLIC_KEY = ? and $RECIPIENT_PUBLIC_KEY = ? ",
             arrayOf(inboxPublicKey, recipientPublicKey)
         )
 

@@ -1,6 +1,7 @@
 package ir.hadiagdamapps.e2eemessenger.data
 
 import androidx.core.text.isDigitsOnly
+import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -22,7 +23,12 @@ object TextFormat {
 
 
     fun isValidPublicKey(text: String): Boolean {
-        TODO()
+        return try {
+            E2EKeyGenerator.getPublicKeyFromString(text)
+            true
+        } catch (ex: Exception) {
+            false
+        }
     }
 
     fun isValidMessage(text: String?): Boolean{

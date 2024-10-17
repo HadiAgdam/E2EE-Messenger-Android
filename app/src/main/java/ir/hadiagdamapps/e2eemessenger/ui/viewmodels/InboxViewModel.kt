@@ -45,6 +45,7 @@ class InboxViewModel : ViewModel() {
     private var navController: NavHostController? = null
     private var data: ConversationData? = null
     private var clipboard: Clipboard? = null
+    private var showWrongPublicKeyFormatError: () -> Unit = {}
     val menuOptions = listOf(
         MenuItem("Copy public key", R.drawable.copy_icon),
         MenuItem("Edit label", R.drawable.edit_icon),
@@ -110,6 +111,9 @@ class InboxViewModel : ViewModel() {
         this.apiService = apiService
         this.incomingMessageHandler = IncomingMessageHandler(context)
         clipboard = Clipboard(context)
+        showWrongPublicKeyFormatError = {
+            Toast.makeText(context, "wrong public key format", Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -246,7 +250,7 @@ class InboxViewModel : ViewModel() {
 
     fun newConversationMenuItemClick(item: MenuItem) {
         when (item) {
-            newConversationMenuOptions[0] -> clipboard?.let {   newConversation(it.readClipboard())}
+            newConversationMenuOptions[0] -> clipboard?.let { it.readClipboard()?.let { text ->  newConversation(text)} }
             newConversationMenuOptions[1] -> TODO("get public key from Qr code and create a new conversation")
         }
         isOptionsMenuOpen = false
@@ -257,9 +261,7 @@ class InboxViewModel : ViewModel() {
         if (TextFormat.isValidPublicKey(publicKey))
         // a new conversation is going to created when user sends first message.
             openConversationScreen(publicKey)
-        else {
-            TODO("create a snackBar or show toast message that says wrong public key")
-        }
+        else showWrongPublicKeyFormatError.invoke()
     }
 
 
