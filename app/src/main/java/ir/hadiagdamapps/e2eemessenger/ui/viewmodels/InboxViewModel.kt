@@ -46,13 +46,13 @@ class InboxViewModel : ViewModel() {
     private var data: ConversationData? = null
     private var clipboard: Clipboard? = null
     val menuOptions = listOf(
-        MenuItem("copy public key", R.drawable.copy_icon),
-        MenuItem("edit label", R.drawable.edit_icon),
-        MenuItem("delete", R.drawable.delete_icon)
+        MenuItem("Copy public key", R.drawable.copy_icon),
+        MenuItem("Edit label", R.drawable.edit_icon),
+        MenuItem("Delete", R.drawable.delete_icon)
     )
     val newConversationMenuOptions = listOf(
-        MenuItem("get from clipboard", R.drawable.copy_icon),
-        MenuItem("scan QR code", R.drawable.scan_qr_code_icon)
+        MenuItem("Get from clipboard", R.drawable.copy_icon),
+        MenuItem("Scan QR code", R.drawable.scan_qr_code_icon)
     )
 
     private val _conversations = mutableStateListOf<ConversationModel>()
@@ -332,6 +332,14 @@ class InboxViewModel : ViewModel() {
 
             }
         }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
+    fun dismissBottomSheets() {
+        isNewConversationDialogOpen = false
+        showEditLabelDialog = false
+        isOptionsMenuOpen = false
     }
 
 }

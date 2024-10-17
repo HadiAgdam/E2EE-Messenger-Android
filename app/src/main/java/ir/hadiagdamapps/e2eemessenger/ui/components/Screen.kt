@@ -28,7 +28,6 @@ import ir.hadiagdamapps.e2eemessenger.ui.theme.ColorPalette
 import kotlinx.coroutines.CoroutineScope
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Screen(
     title: String,
@@ -36,22 +35,15 @@ fun Screen(
     iconClick: () -> Unit = {},
     iconTint: Color = Color.White,
     fabClick: (() -> Unit)? = null,
-    sheetContent: (@Composable ColumnScope.() -> Unit) = {},
-    scaffoldState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(),
     content: @Composable () -> Unit,
 ) {
 
 
-    BottomSheetScaffold(topBar = {
+    Scaffold(topBar = {
         TopBar(
             title = title, icon = icon, iconClick = iconClick, iconTint = iconTint
         )
     },
-        sheetShape = RectangleShape,
-        sheetContent = sheetContent,
-        sheetDragHandle = null,
-        sheetPeekHeight = 0.dp,
-        scaffoldState = scaffoldState,
         content = { padding ->
 
             Surface(
@@ -94,7 +86,6 @@ fun Screen(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun ScreenPreview() {

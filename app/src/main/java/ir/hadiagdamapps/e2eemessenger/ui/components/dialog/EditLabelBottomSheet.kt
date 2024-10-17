@@ -85,36 +85,3 @@ fun EditLabelBottomSheet(
 
     }
 }
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Composable
-fun EditLabelBottomSheetDialogPreview() {
-
-    E2EEMessengerTheme {
-
-
-        val state = rememberBottomSheetScaffoldState(
-            bottomSheetState = SheetState(
-                true, initialValue = SheetValue.Expanded
-            )
-        )
-
-        var text by remember {
-            mutableStateOf("")
-        }
-
-        Screen(title = "Preview", scaffoldState = state, sheetContent = {
-            EditLabelBottomSheet(text = text,
-                onOkClick = { /*TODO*/ },
-                onCancelClick = { /*TODO*/ }) {
-                text = it
-            }
-        }) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "content", color = Color.White)
-            }
-        }
-    }
-}
