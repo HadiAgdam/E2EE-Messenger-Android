@@ -8,9 +8,7 @@ import ir.hadiagdamapps.e2eemessenger.data.database.columns.PendingMessagesColum
 import ir.hadiagdamapps.e2eemessenger.data.database.columns.PendingMessagesColumn.*
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.PendingMessageModel
 
-class PendingMessageData(context: Context) :
-    SQLiteOpenHelper(context, MessengerDatabase.DB_NAME, null, MessengerDatabase.DB_VERSION) {
-    private val table = Table.PENDING_MESSAGES
+class PendingMessageData(context: Context) : DatabaseHelper(context, Table.PENDING_MESSAGES) {
 
 
     fun newPendingMessage(
@@ -70,16 +68,6 @@ class PendingMessageData(context: Context) :
         while (c.moveToNext())
 
         c.close()
-    }
-
-
-    override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(table.createQuery)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL(table.dropQuery)
-        onCreate(db)
     }
 }
 

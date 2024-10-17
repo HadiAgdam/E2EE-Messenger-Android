@@ -16,10 +16,7 @@ import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator
 import ir.hadiagdamapps.e2eemessenger.data.encryption.e2e.E2EKeyGenerator.toText
 
 
-class InboxData(context: Context) :
-    SQLiteOpenHelper(context, MessengerDatabase.DB_NAME, null, MessengerDatabase.DB_VERSION) {
-
-    private val table = Table.INBOXES
+class InboxData(context: Context): DatabaseHelper(context, Table.INBOXES){
 
     private fun isPublicKeyExists(publicKey: String): Boolean {
         val query = "SELECT 1 FROM ${table.tableName} WHERE $INBOX_PUBLIC_KEY = ?"
@@ -155,16 +152,6 @@ class InboxData(context: Context) :
         return null
     }
 
-    // -------------------------------------------------------------------
-
-    override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(table.createQuery)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL(table.dropQuery)
-        onCreate(db)
-    }
 }
 
 private fun ContentValues.put(key: InboxesTableColumns, value: Int) {

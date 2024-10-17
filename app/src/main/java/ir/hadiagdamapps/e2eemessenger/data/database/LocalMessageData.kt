@@ -12,10 +12,8 @@ import ir.hadiagdamapps.e2eemessenger.data.models.messages.ChatMessageModel
 import javax.crypto.SecretKey
 
 
-class LocalMessageData(context: Context) :
-    SQLiteOpenHelper(context, MessengerDatabase.DB_NAME, null, MessengerDatabase.DB_VERSION) {
+class LocalMessageData(context: Context) :DatabaseHelper(context, Table.LOCAL_MESSAGES) {
 
-    private val table = Table.LOCAL_MESSAGES
 
     fun getMessageById(messageId: Long): LocalMessageModel? {
         val c = readableDatabase.rawQuery(
@@ -72,14 +70,6 @@ class LocalMessageData(context: Context) :
         return result
     }
 
-    override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(table.createQuery)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        db?.execSQL(table.dropQuery)
-        onCreate(db)
-    }
 }
 
 private fun ContentValues.put(key: LocalMessagesTableColumn, value: String) {

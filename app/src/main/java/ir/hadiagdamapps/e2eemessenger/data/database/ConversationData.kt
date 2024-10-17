@@ -10,10 +10,8 @@ import ir.hadiagdamapps.e2eemessenger.data.database.columns.ConversationsTableCo
 import ir.hadiagdamapps.e2eemessenger.data.models.ConversationModel
 
 
-class ConversationData(context: Context) :
-    SQLiteOpenHelper(context, MessengerDatabase.DB_NAME, null, MessengerDatabase.DB_VERSION) {
+class ConversationData(context: Context) : DatabaseHelper(context, Table.CONVERSATIONS){
 
-    private val table = Table.CONVERSATIONS
     private val localMessageData = LocalMessageData(context)
 
     fun loadConversations(inboxId: Long): List<ConversationModel> {
@@ -140,17 +138,6 @@ class ConversationData(context: Context) :
 
         c.close()
         return -1
-    }
-
-    override fun onCreate(db: SQLiteDatabase?) {
-        Log.e("position", "create")
-        db?.execSQL(table.createQuery)
-    }
-
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        Log.e("position", "update")
-        db?.execSQL(table.dropQuery)
-        onCreate(db)
     }
 
 }
