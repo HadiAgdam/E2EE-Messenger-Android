@@ -44,6 +44,7 @@ class InboxViewModel : ViewModel() {
     private var inbox: InboxModel? = null
     private var navController: NavHostController? = null
     private var data: ConversationData? = null
+    private var clipboard: Clipboard? = null
     val menuOptions = listOf(
         MenuItem("copy public key", R.drawable.copy_icon),
         MenuItem("edit label", R.drawable.edit_icon),
@@ -91,7 +92,6 @@ class InboxViewModel : ViewModel() {
         private set
 
 
-    // TODO user should enter pin to generate private key first
 
     // Dear future me, please forgive me. I know this is wrong but I don't know any better way.
     fun init(
@@ -109,6 +109,7 @@ class InboxViewModel : ViewModel() {
         this.data = ConversationData(context)
         this.apiService = apiService
         this.incomingMessageHandler = IncomingMessageHandler(context)
+        clipboard = Clipboard(context)
     }
 
 
@@ -194,7 +195,7 @@ class InboxViewModel : ViewModel() {
         when (item) {
 
             menuOptions[0] -> {
-                Clipboard.copy((optionsMenuContent ?: return).senderPublicKey)
+                clipboard!!.copy((optionsMenuContent ?: return).senderPublicKey)
                 optionsMenuContent = null
             }
 
@@ -245,7 +246,7 @@ class InboxViewModel : ViewModel() {
 
     fun newConversationMenuItemClick(item: MenuItem) {
         when (item) {
-            newConversationMenuOptions[0] -> newConversation(Clipboard.readClipboard())
+            newConversationMenuOptions[0] -> clipboard?.let {   newConversation(it.readClipboard())}
             newConversationMenuOptions[1] -> TODO("get public key from Qr code and create a new conversation")
         }
         isOptionsMenuOpen = false

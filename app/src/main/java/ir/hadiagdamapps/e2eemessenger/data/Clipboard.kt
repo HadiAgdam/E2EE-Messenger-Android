@@ -1,10 +1,16 @@
 package ir.hadiagdamapps.e2eemessenger.data
 
-object Clipboard {
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+
+class Clipboard(private val context: Context) {
 
     // copy text to clipboard
-    fun copy(text: String) {
-        TODO()
+    fun copy(text: String, label: String = "E2EE-Messenger") {
+        (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager).apply {
+            setPrimaryClip(ClipData.newPlainText(label, text))
+        }
     }
 
     fun readClipboard(): String {

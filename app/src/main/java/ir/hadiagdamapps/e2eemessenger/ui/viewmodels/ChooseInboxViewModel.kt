@@ -1,6 +1,7 @@
 package ir.hadiagdamapps.e2eemessenger.ui.viewmodels
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,9 +22,10 @@ import ir.hadiagdamapps.e2eemessenger.ui.navigation.routes.InboxScreenRoute
 class ChooseInboxViewModel : ViewModel() {
 
     private val qrCodeGenerator = QrCodeGenerator()
-
+    private var clipboard: Clipboard? = null
     private var navController: NavController? = null
     private var data: InboxData? = null
+    private var showCopiedMessage: () -> Unit = {  }
 
     private val _inboxes = mutableStateListOf<InboxModel>()
     val inboxes: SnapshotStateList<InboxModel> = _inboxes
@@ -46,6 +48,10 @@ class ChooseInboxViewModel : ViewModel() {
         this.navController = navController
         data = InboxData(context)
         loadInboxes()
+        clipboard = Clipboard(context)
+        showCopiedMessage = {
+            Toast.makeText(context, "public key copied", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // ---------------------------------------------------------------------------------------
@@ -65,7 +71,8 @@ class ChooseInboxViewModel : ViewModel() {
     }
 
     fun inboxDialogCopyPublicKey() {
-        inboxDialog?.dialogPublicKey?.let { Clipboard.copy(it) }
+        inboxDialog?.dialogPublicKey?.let { clipboard!!.copy(it) }
+        showCopiedMessage.invoke()
     }
 
     fun showInboxDialog(inbox: InboxModel) {
@@ -85,7 +92,7 @@ class ChooseInboxViewModel : ViewModel() {
     }
 
     fun pinDialogSubmit() {
-        if (TextFormat.isValidPin(pin)) data!!.newInbox(pin!!).apply {
+        if (TextFormat.isValidPin(pin)) data!!.newInbox(pin).apply {
             _inboxes.add(this)
             pinDialogDismiss()
             showInboxDialog(this)
@@ -101,6 +108,7 @@ class ChooseInboxViewModel : ViewModel() {
 
     fun newInbox() {
         showPinDialog = true
+        pin = ""
     }
 
     // ---------------------------------------------------------------------------------------
