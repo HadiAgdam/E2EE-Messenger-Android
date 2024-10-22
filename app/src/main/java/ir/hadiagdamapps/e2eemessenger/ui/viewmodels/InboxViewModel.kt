@@ -93,7 +93,6 @@ class InboxViewModel : ViewModel() {
         private set
 
 
-
     // Dear future me, please forgive me. I know this is wrong but I don't know any better way.
     fun init(
         navController: NavHostController,
@@ -203,8 +202,10 @@ class InboxViewModel : ViewModel() {
                 optionsMenuContent = null
             }
 
-            menuOptions[1] ->{ editLabelDialogText = optionsMenuContent?.label!!
-            showEditLabelDialog = true}
+            menuOptions[1] -> {
+                editLabelDialogText = optionsMenuContent?.label!!
+                showEditLabelDialog = true
+            }
 
             menuOptions[2] -> isConfirmDeleteDialogOpen = true
         }
@@ -249,19 +250,26 @@ class InboxViewModel : ViewModel() {
     }
 
     fun newConversationMenuItemClick(item: MenuItem) {
+        isOptionsMenuOpen = false
         when (item) {
-            newConversationMenuOptions[0] -> clipboard?.let { it.readClipboard()?.let { text ->  newConversation(text)} }
+            newConversationMenuOptions[0] -> {
+                clipboard?.let {
+                    newConversation(it.readClipboard())
+                }
+            }
+
             newConversationMenuOptions[1] -> TODO("get public key from Qr code and create a new conversation")
         }
-        isOptionsMenuOpen = false
+//        isOptionsMenuOpen = false
     }
 
 
-    private fun newConversation(publicKey: String) {
-        if (TextFormat.isValidPublicKey(publicKey))
-        // a new conversation is going to created when user sends first message.
+    private fun newConversation(publicKey: String?) {
+        if (publicKey != null && TextFormat.isValidPublicKey(publicKey))
             openConversationScreen(publicKey)
-        else showWrongPublicKeyFormatError.invoke()
+        else showWrongPublicKeyFormatError.invoke().apply {
+            Log.e("text format does not math", "")
+        }
     }
 
 
@@ -274,7 +282,7 @@ class InboxViewModel : ViewModel() {
                 senderPublicKey = conversationPublicKey,
                 aesKeyPin = pin!!,
                 aesKeySalt = inbox!!.salt!!,
-                conversationLabel =  inbox!!.label
+                conversationLabel = inbox!!.label
 
             )
         )
