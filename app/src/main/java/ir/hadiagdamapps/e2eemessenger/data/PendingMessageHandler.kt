@@ -1,5 +1,6 @@
 package ir.hadiagdamapps.e2eemessenger.data
 
+import android.util.Log
 import ir.hadiagdamapps.e2eemessenger.data.database.PendingMessageData
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.OutgoingMessage
 import ir.hadiagdamapps.e2eemessenger.data.models.messages.PendingMessageModel
@@ -27,13 +28,18 @@ abstract class PendingMessageHandler
         sending = true
         while (sending) {
 
-            pendingMessages.toList().forEach {
-                if (apiService.newMessage(it.toOutgoingMessage()).isSuccessful) {
-                    pendingMessages.remove(it)
+            try {
+                pendingMessages.toList().forEach {
+                    if (apiService.newMessage(it.toOutgoingMessage()).isSuccessful) {
+                        pendingMessages.remove(it)
+                    }
                 }
+            } catch (ex: Exception) {
+                Log.e("error", ex.toString())
             }
 
-            delay(2000)
+
+            delay(500)
         }
     }
 

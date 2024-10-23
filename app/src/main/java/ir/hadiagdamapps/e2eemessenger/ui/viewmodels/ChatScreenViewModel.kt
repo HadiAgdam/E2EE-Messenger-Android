@@ -153,6 +153,9 @@ class ChatScreenViewModel : ViewModel() {
 
         if (conversationId != null) loadMessages()
         loadPendingMessages()
+        viewModelScope.launch {
+            pendingMessageHandler?.startSendingMessages()
+        }
     }
 
     fun cancelSending(pendingMessageId: Int) {
