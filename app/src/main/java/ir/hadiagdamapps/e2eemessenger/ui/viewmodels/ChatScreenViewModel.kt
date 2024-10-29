@@ -83,7 +83,7 @@ class ChatScreenViewModel : ViewModel() {
         val preview = AesEncryptor.encryptMessage(chatBoxContent, aesKey!!)
 
 
-        val id = pendingMessageHandler!!.newPendingMessage(
+        pendingMessageHandler!!.newPendingMessage(
             encryptedKey = encryptedKey,
             message = message.first,
             iv = message.second,
@@ -91,7 +91,7 @@ class ChatScreenViewModel : ViewModel() {
             previewIv = preview.second
         )
 
-        _pendingMessages.add(Pair(id, chatBoxContent)) // not sure
+//        _pendingMessages.add(Pair(id, chatBoxContent)) // not sure
 
         chatBoxContent = ""
     }
@@ -131,9 +131,14 @@ class ChatScreenViewModel : ViewModel() {
             PendingMessageData(context), inbox!!.publicKey, senderPublicKey!!, apiService
         ) {
             override fun messageSent(pendingMessageId: Int) {
-                for (message in _pendingMessages) if (message.first == pendingMessageId) _pendingMessages.remove(
-                    message
-                )
+                _pendingMessages.first { it.first == pendingMessageId }.apply {
+                    _chats.add(ChatMessageModel(
+                        text = second,
+                        sent = true,
+                        time = 0
+                    ))
+                    _pendingMessages.remove(this)
+                }
             }
 
             override fun gotNewPendingMessage(pendingPreviewMessageModel: PendingPreviewMessageModel) {
@@ -154,6 +159,7 @@ class ChatScreenViewModel : ViewModel() {
         if (conversationId != null) loadMessages()
         loadPendingMessages()
         viewModelScope.launch {
+            Log.e("position", "started sending messages")
             pendingMessageHandler?.startSendingMessages()
         }
     }

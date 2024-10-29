@@ -32,6 +32,7 @@ abstract class PendingMessageHandler
                 pendingMessages.toList().forEach {
                     if (apiService.newMessage(it.toOutgoingMessage()).isSuccessful) {
                         pendingMessages.remove(it)
+                        messageSent(it.messageId)
                     }
                 }
             } catch (ex: Exception) {
